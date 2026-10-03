@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cost of Living · BYOK by DTDM</title>
+<meta name="description" content="Enter any city or ZIP and get an itemized monthly cost of living breakdown built from current, cited sources. Runs on your own API key.">
+<meta name="theme-color" content="#0a0c10">
+<meta property="og:title" content="Cost of Living · BYOK by DTDM">
+<meta property="og:description" content="Itemized monthly budget for any place, built from current sources. Runs on your own API key.">
+<meta property="og:url" content="https://byok.dtdm.us/cost-of-living">
+<link rel="canonical" href="https://byok.dtdm.us/cost-of-living">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="preload" href="../assets/fonts/archivo-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../assets/fonts.css">
+<link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+
+<header class="shell site-header">
+  <a class="brand" href="../" aria-label="BYOK Tools home"><b>DTDM</b><span class="pill">BYOK</span></a>
+  <nav class="nav" aria-label="Main">
+    <a href="../#tools">Tools</a>
+    <a href="https://dtdm.us" target="_blank" rel="noopener">dtdm.us ↗</a>
+  </nav>
+</header>
+
+<main class="shell" style="gap:24px;padding-bottom:8px">
+  <a class="back" href="../">← All tools</a>
+
+  <section class="tool-head">
+    <div class="body">
+      <div class="slug">byok.dtdm.us/cost-of-living</div>
+      <h1>Cost of Living</h1>
+      <p>Enter any city or ZIP and get an itemized monthly cost breakdown: housing, food, transit, healthcare and more, built from current, cited sources.</p>
+      <div class="chips">
+        <span>Research</span>
+        <span>Live search · Itemized table</span>
+        <span>Claude · OpenAI · Gemini</span>
+        <span>v1.0 — updated Oct 2026</span>
+      </div>
+    </div>
+    <div class="btn-row">
+      <a class="btn" href="../tools/cost-of-living.html" download="cost-of-living.html">Download .html</a>
+      <button type="button" class="btn" data-source="../tools/cost-of-living.html" aria-expanded="false" aria-controls="codebox">View source</button>
+      <button type="button" class="btn btn-primary" data-copy="../tools/cost-of-living.html">Copy full code</button>
+    </div>
+  </section>
+  <div class="copy-state" data-copy-state role="status" aria-live="polite"></div>
+
+  <div class="codebox" id="codebox" hidden>
+    <pre tabindex="0" aria-label="Full source code of the tool">Loading…</pre>
+  </div>
+
+  <div class="runner">
+    <iframe data-tool title="Cost of Living" src="../tools/cost-of-living.html" loading="lazy"></iframe>
+  </div>
+
+  <section class="trust" aria-labelledby="trust-h">
+    <h2 id="trust-h">Before you paste a key</h2>
+    <ul>
+      <li>The key is stored in this browser's localStorage only if you tick "Remember on this device". Leave it unticked and nothing is saved.</li>
+      <li>Requests go directly from your browser to the provider you pick (Anthropic, OpenAI, or Google). No DTDM server sees your key, your inputs, or your results.</li>
+      <li>The whole tool is one readable HTML file. Use View source above and check the request code yourself.</li>
+      <li>Use a dedicated key, set a spend limit on it in your provider's console, and delete it when you're done. This tool runs live web searches, which cost more per run than a plain chat reply.</li>
+    </ul>
+  </section>
+
+  <section class="how" aria-labelledby="how-h">
+    <h2 id="how-h">Host it on your own site</h2>
+    <ol>
+      <li><strong>Copy full code</strong> above, or Download .html.</li>
+      <li>Save it as <code>cost-of-living.html</code>, or paste it into a file ending in <code>.html</code>.</li>
+      <li>Upload it to any static host, or double-click it to run locally. It has its own key field and stores a remembered key on your site, separate from this one.</li>
+    </ol>
+    <p class="muted">Figures are estimates built from web sources at the time you run it. Verify anything that drives a real decision.</p>
+  </section>
+</main>
+
+<footer class="shell site-footer">
+  <span>Built by <a href="https://dtdm.us" target="_blank" rel="noopener">Dan the Digital Man</a></span>
+  <span>API usage is billed by your provider.</span>
+</footer>
+
+<script src="../assets/site.js"></script>
+</body>
+</html>

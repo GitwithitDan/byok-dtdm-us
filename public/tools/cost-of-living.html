@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cost of Living · BYOK by DTDM</title>
+<!--
+  Cost of Living — BYOK tool by DTDM · v1.0 — updated Oct 2026
+  One self-contained file. No dependencies, no build step, no external fonts or scripts.
+  Your API key is kept in this browser's localStorage only if you tick "Remember on this device".
+  The only network requests this file makes go to the provider you pick:
+    api.anthropic.com · api.openai.com · generativelanguage.googleapis.com
+  Host it anywhere that serves static files, or double-click it.
+-->
+<style>
+:root{--bg:#0a0c10;--panel:#11141b;--panel2:#171b25;--line:#252b38;--ink:#eef1f6;--mute:#9aa3b2;--acc:#3ee6c4;--accink:#04140f;--err:#ff8a8a}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 Archivo,system-ui,sans-serif}
+a{color:var(--acc)}a:hover{color:#9af5e2}
+.wrap{max-width:960px;margin:0 auto;padding:40px 20px 64px;display:grid;gap:16px}
+.embedded .wrap{padding:0 0 4px;max-width:none}
+.embedded .top{display:none}
+.mono{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12px;letter-spacing:.08em;text-transform:uppercase}
+.eyebrow{color:var(--acc)}
+h1{font-size:40px;line-height:1.05;margin:6px 0 8px;letter-spacing:-.025em;font-weight:800}
+.lede{color:var(--mute);margin:0;max-width:62ch;text-wrap:pretty}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px;display:grid;gap:16px}
+.card h2{margin:0;color:var(--mute);font-weight:500}
+.grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(min(100%,190px),1fr))}
+.f{display:grid;gap:6px;font-size:13px;color:var(--mute);align-content:start}
+input,select{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px;min-height:44px;width:100%}
+input:focus,select:focus{outline:2px solid var(--acc);outline-offset:-1px}
+.keyrow{display:flex;gap:8px}.keyrow input{flex:1;min-width:0}
+.seg{display:flex;gap:4px;padding:4px;background:var(--bg);border:1px solid var(--line);border-radius:10px;min-height:44px}
+.seg label{flex:1;position:relative;display:flex}
+.seg input{position:absolute;opacity:0;pointer-events:none}
+.seg span{flex:1;display:flex;align-items:center;justify-content:center;padding:6px 8px;border-radius:7px;color:var(--mute);cursor:pointer;font-size:14px;text-align:center}
+.seg input:checked+span{background:var(--panel2);color:var(--ink);box-shadow:inset 0 0 0 1px var(--line)}
+.seg input:focus-visible+span{outline:2px solid var(--acc)}
+.btn{font:600 15px Archivo,system-ui,sans-serif;border:0;border-radius:10px;padding:10px 18px;min-height:44px;cursor:pointer;background:var(--acc);color:var(--accink)}
+.btn:hover{filter:brightness(1.08)}.btn:disabled{opacity:.55;cursor:progress}
+.btn.ghost{background:transparent;color:var(--ink);box-shadow:inset 0 0 0 1px var(--line)}
+.btn.ghost:hover{box-shadow:inset 0 0 0 1px var(--acc);filter:none}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.check{display:flex;gap:8px;align-items:center;font-size:14px;color:var(--mute);cursor:pointer}
+.check input{width:18px;height:18px;min-height:0;accent-color:var(--acc)}
+.note{font-size:13px;color:var(--mute);margin:0}
+.status:empty{display:none}
+.status{border-radius:12px;padding:14px 16px;display:flex;gap:12px;align-items:center;background:var(--panel);border:1px solid var(--line)}
+.status.err{border-color:#5a2a2a;color:var(--err)}
+.spin{width:16px;height:16px;border-radius:50%;border:2px solid var(--line);border-top-color:var(--acc);animation:s 0.8s linear infinite;flex:none}
+@keyframes s{to{transform:rotate(360deg)}}
+.totals{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,180px),1fr));gap:12px}
+.stat{background:var(--panel2);border-radius:10px;padding:14px 16px;display:grid;gap:2px}
+.stat b{font-size:30px;font-weight:800;letter-spacing:-.025em;line-height:1.1}
+.stat span{color:var(--mute);font-size:13px}
+.bar{display:flex;height:12px;border-radius:99px;overflow:hidden;gap:2px}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13px;color:var(--mute)}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.tbl{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:14px;min-width:560px}
+th,td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--mute);font-weight:500}
+.n{text-align:right;font-family:'JetBrains Mono',ui-monospace,monospace;white-space:nowrap;font-size:13px}
+tr.cat td{background:var(--panel2);font-weight:700;border-bottom:0}
+td.basis{color:var(--mute);font-size:13px}
+.src{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12px;text-decoration:none}
+ol.sources{margin:0;padding-left:22px;display:grid;gap:6px;font-size:14px;word-break:break-word}
+.summary{margin:0;color:var(--ink);text-wrap:pretty}
+</style>
+</head>
+<body>
+<main class="wrap" id="wrap">
+  <header class="top">
+    <a class="mono eyebrow" href="https://byok.dtdm.us" style="text-decoration:none">BYOK · DTDM</a>
+    <h1>Cost of Living</h1>
+    <p class="lede">Enter a city or ZIP. Get an itemized monthly budget built from current, cited sources.</p>
+  </header>
+
+  <section class="card" aria-labelledby="k-h">
+    <h2 class="mono" id="k-h">Your API key</h2>
+    <div class="grid">
+      <label class="f">Provider
+        <select id="prov">
+          <option value="anthropic">Anthropic (Claude)</option>
+          <option value="openai">OpenAI</option>
+          <option value="gemini">Google Gemini</option>
+        </select>
+      </label>
+      <label class="f">Model
+        <input id="model" autocomplete="off" spellcheck="false">
+      </label>
+    </div>
+    <label class="f">API key
+      <span class="keyrow">
+        <input id="key" type="password" autocomplete="off" spellcheck="false">
+        <button type="button" class="btn ghost" id="show">Show</button>
+      </span>
+    </label>
+    <div class="row" style="justify-content:space-between">
+      <label class="check"><input type="checkbox" id="rem"> Remember on this device</label>
+      <p class="note" id="keynote"></p>
+    </div>
+  </section>
+
+  <form class="card" id="f" aria-labelledby="q-h">
+    <h2 class="mono" id="q-h">Where &amp; who</h2>
+    <label class="f">City, neighborhood, or ZIP
+      <input name="area" required placeholder="e.g. Austin, TX or 78704">
+    </label>
+    <div class="grid">
+      <label class="f">Adults<input name="adults" type="number" min="1" max="10" value="1"></label>
+      <label class="f">Children<input name="kids" type="number" min="0" max="10" value="0"></label>
+    </div>
+    <div class="grid">
+      <div class="f">Lifestyle
+        <div class="seg">
+          <label><input type="radio" name="style" value="frugal"><span>Frugal</span></label>
+          <label><input type="radio" name="style" value="moderate" checked><span>Moderate</span></label>
+          <label><input type="radio" name="style" value="comfortable"><span>Comfortable</span></label>
+        </div>
+      </div>
+      <div class="f">Housing
+        <div class="seg">
+          <label><input type="radio" name="housing" value="renting" checked><span>Rent</span></label>
+          <label><input type="radio" name="housing" value="owning with a mortgage"><span>Own</span></label>
+        </div>
+      </div>
+      <div class="f">Getting around
+        <div class="seg">
+          <label><input type="radio" name="transport" value="owns a car" checked><span>Car</span></label>
+          <label><input type="radio" name="transport" value="public transit only"><span>Transit</span></label>
+        </div>
+      </div>
+    </div>
+    <div class="row"><button class="btn" id="go" type="submit">Build breakdown</button></div>
+  </form>
+
+  <div class="status" id="status" role="status" aria-live="polite"></div>
+
+  <section class="card" id="out" hidden>
+    <div class="row" style="justify-content:space-between">
+      <h2 class="mono" id="o-h">Monthly breakdown</h2>
+      <div class="row">
+        <button type="button" class="btn ghost" id="cpcsv">Copy CSV</button>
+        <button type="button" class="btn ghost" id="cpmd">Copy Markdown</button>
+      </div>
+    </div>
+    <p class="summary" id="summary"></p>
+    <div class="totals" id="totals"></div>
+    <div class="bar" id="bar"></div>
+    <div class="legend" id="legend"></div>
+    <div class="tbl"><table id="table"></table></div>
+    <div id="srcwrap" style="display:grid;gap:10px">
+      <h2 class="mono">Sources</h2>
+      <ol class="sources" id="sources"></ol>
+    </div>
+    <p class="note">Estimates from live web sources at time of search. Verify before making decisions.</p>
+  </section>
+</main>
+<script>
+(function(){
+var P={
+  anthropic:{name:'Anthropic',model:'claude-sonnet-5-5',ph:'sk-ant-...'},
+  openai:{name:'OpenAI',model:'gpt-4.1',ph:'sk-...'},
+  gemini:{name:'Google',model:'gemini-2.5-flash',ph:'AIza...'}
+};
+var NS='byok.cost-of-living.';
+var COLORS=['oklch(0.84 0.14 172)','oklch(0.78 0.13 220)','oklch(0.82 0.13 95)','oklch(0.74 0.15 300)','oklch(0.78 0.14 30)','oklch(0.72 0.12 140)','oklch(0.80 0.10 260)','oklch(0.70 0.04 250)'];
+function $(id){return document.getElementById(id)}
+function get(k){try{return localStorage.getItem(NS+k)}catch(e){return null}}
+function set(k,v){try{if(v==null)localStorage.removeItem(NS+k);else localStorage.setItem(NS+k,v)}catch(e){}}
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+function safeUrl(u){try{var p=new URL(String(u));return(p.protocol==='https:'||p.protocol==='http:')?p.href:''}catch(e){return''}}
+
+var embedded=false;try{embedded=window.self!==window.top}catch(e){embedded=true}
+if(embedded)document.documentElement.classList.add('embedded');
+function post(){if(!embedded)return;try{parent.postMessage({byokHeight:document.body.offsetHeight},'*')}catch(e){}}
+if(window.ResizeObserver)new ResizeObserver(post).observe(document.body);
+window.addEventListener('load',post);post();
+
+var prov=$('prov'),model=$('model'),key=$('key'),rem=$('rem');
+function loadProv(){
+  var p=prov.value;
+  model.value=get('model.'+p)||P[p].model;
+  key.placeholder=P[p].ph;
+  var k=get('key.'+p);key.value=k||'';rem.checked=!!k;
+  $('keynote').textContent='Sent only to '+P[p].name+', straight from this browser.';
+}
+prov.value=get('provider')||'anthropic';loadProv();
+prov.onchange=function(){set('provider',prov.value);loadProv()};
+$('show').onclick=function(){key.type=key.type==='password'?'text':'password';this.textContent=key.type==='password'?'Show':'Hide'};
+rem.onchange=function(){if(!rem.checked)set('key.'+prov.value,null)};
+
+function prompt(i){
+  return [
+    'You are a cost-of-living researcher. Use web search to find CURRENT local prices for the area below. Today is '+new Date().toISOString().slice(0,10)+'.',
+    'Area: '+i.area,
+    'Household: '+i.adults+' adult(s), '+i.kids+' child(ren)',
+    'Lifestyle: '+i.style,
+    'Housing: '+i.housing,
+    'Transportation: household '+i.transport,
+    '',
+    'Return ONLY one JSON object. No prose before or after, no code fences. Shape:',
+    '{"area":string,"currency":ISO 4217 code,"summary":string (1-2 sentences on how this area compares),"items":[{"category":one of "Housing","Utilities","Food","Transportation","Healthcare","Childcare","Personal","Other","item":string,"low":number,"typical":number,"high":number,"basis":string (short: how the figure was derived),"source":1-based index into sources or null}],"sources":[{"title":string,"url":string}]}',
+    'All amounts are MONTHLY for the whole household, whole numbers, in local currency. 10 to 18 line items. Omit Childcare if there are no children. Ground every figure in a source where possible.'
+  ].join('\n');
+}
+
+async function jfetch(url,opt){
+  var r=await fetch(url,opt);var t=await r.text();var j;
+  try{j=JSON.parse(t)}catch(e){throw new Error('HTTP '+r.status+': '+t.slice(0,200))}
+  if(!r.ok){
+    var m=(j.error&&(j.error.message||j.error))||('HTTP '+r.status);m=typeof m==='string'?m:JSON.stringify(m);
+    if(r.status===401)m='The key was rejected (401). Check that you pasted the whole key and picked the matching provider. '+m;
+    else if(r.status===429)m='Rate limit or spend limit reached (429). Wait a minute, or check your limits in your provider console. '+m;
+    throw new Error(m)
+  }
+  return j;
+}
+
+var CALL={
+  anthropic:async function(k,m,q){
+    var msgs=[{role:'user',content:q}],text='',cites=[];
+    for(var n=0;n<4;n++){
+      var j=await jfetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'content-type':'application/json','x-api-key':k,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:m,max_tokens:8000,tools:[{type:'web_search_20250305',name:'web_search',max_uses:6}],messages:msgs})});
+      j.content.forEach(function(b){if(b.type==='text'){text+=b.text;(b.citations||[]).forEach(function(c){if(c.url)cites.push({title:c.title||c.url,url:c.url})})}});
+      if(j.stop_reason==='max_tokens')throw new Error('The response was cut off before it finished. Try again, or pick a more capable model.');
+      if(j.stop_reason!=='pause_turn')break;
+      msgs.push({role:'assistant',content:j.content});
+    }
+    return {text:text,cites:cites};
+  },
+  openai:async function(k,m,q){
+    var j=await jfetch('https://api.openai.com/v1/responses',{method:'POST',headers:{'content-type':'application/json','Authorization':'Bearer '+k},body:JSON.stringify({model:m,tools:[{type:'web_search'}],input:q})});
+    var text='',cites=[];
+    (j.output||[]).forEach(function(o){if(o.type==='message')(o.content||[]).forEach(function(c){if(c.type==='output_text'){text+=c.text;(c.annotations||[]).forEach(function(a){if(a.type==='url_citation')cites.push({title:a.title||a.url,url:a.url})})}})});
+    return {text:text,cites:cites};
+  },
+  gemini:async function(k,m,q){
+    var j=await jfetch('https://generativelanguage.googleapis.com/v1beta/models/'+encodeURIComponent(m)+':generateContent',{method:'POST',headers:{'content-type':'application/json','x-goog-api-key':k},body:JSON.stringify({contents:[{role:'user',parts:[{text:q}]}],tools:[{google_search:{}}]})});
+    var c=(j.candidates||[])[0]||{};var text=((c.content&&c.content.parts)||[]).map(function(p){return p.text||''}).join('');
+    var cites=(((c.groundingMetadata||{}).groundingChunks)||[]).filter(function(g){return g.web}).map(function(g){return{title:g.web.title||g.web.uri,url:g.web.uri}});
+    return {text:text,cites:cites};
+  }
+};
+
+function parse(t){
+  var a=t.indexOf('{'),b=t.lastIndexOf('}');
+  if(a<0||b<a)throw new Error('The model did not return a breakdown. Try again, or switch models.');
+  try{return JSON.parse(t.slice(a,b+1))}catch(e){
+    var c=t.lastIndexOf('{"area"');
+    if(c>=0){try{return JSON.parse(t.slice(c,b+1))}catch(e2){}}
+    throw new Error('Could not read the response as a table. Try again.');
+  }
+}
+
+function setStatus(kind,msg){
+  var s=$('status');s.className='status '+kind;
+  if(!msg){s.innerHTML='';return}
+  s.innerHTML=(kind==='busy'?'<span class="spin"></span>':'')+'<span>'+esc(msg)+'</span>'+(kind==='busy'?'<span class="mono" id="elapsed" style="margin-left:auto;color:var(--mute)">0s</span>':'');
+  post();
+}
+
+var last=null;
+function render(d){
+  var cur=d.currency||'USD',fmt;
+  try{fmt=new Intl.NumberFormat(undefined,{style:'currency',currency:cur,maximumFractionDigits:0})}catch(e){fmt=new Intl.NumberFormat(undefined,{style:'currency',currency:'USD',maximumFractionDigits:0})}
+  var items=(d.items||[]).map(function(n){var ty=+n.typical||0;return{category:n.category||'Other',item:n.item||'',low:+n.low||ty,typical:ty,high:+n.high||ty,basis:n.basis||'',source:n.source}});
+  if(!items.length)throw new Error('No line items came back. Try a more specific area.');
+  var srcs=(d.sources||[]).map(function(s){return{title:s&&s.title,url:safeUrl(s&&s.url)}}).filter(function(s){return s.url});
+  var cats=[],by={};
+  items.forEach(function(it){if(!by[it.category]){by[it.category]=[];cats.push(it.category)}by[it.category].push(it)});
+  function sum(a,k){return a.reduce(function(t,x){return t+x[k]},0)}
+  var T={low:sum(items,'low'),typical:sum(items,'typical'),high:sum(items,'high')};
+  last={d:d,items:items,srcs:srcs,fmt:fmt,T:T};
+
+  $('o-h').textContent='Monthly breakdown · '+(d.area||'');
+  $('summary').textContent=d.summary||'';
+  $('totals').innerHTML=
+    '<div class="stat"><span>Typical / month</span><b>'+fmt.format(T.typical)+'</b></div>'+
+    '<div class="stat"><span>Range / month</span><b>'+fmt.format(T.low)+' – '+fmt.format(T.high)+'</b></div>'+
+    '<div class="stat"><span>Typical / year</span><b>'+fmt.format(T.typical*12)+'</b></div>';
+  $('bar').innerHTML=cats.map(function(c,i){var v=sum(by[c],'typical');return '<div title="'+esc(c)+'" style="flex:'+v+' 0 0;background:'+COLORS[i%COLORS.length]+'"></div>'}).join('');
+  $('legend').innerHTML=cats.map(function(c,i){var v=sum(by[c],'typical');return '<span><i style="background:'+COLORS[i%COLORS.length]+'"></i>'+esc(c)+' '+Math.round(v/(T.typical||1)*100)+'%</span>'}).join('');
+  var h='<thead><tr><th>Item</th><th class="n">Low</th><th class="n">Typical</th><th class="n">High</th><th>Basis</th></tr></thead><tbody>';
+  cats.forEach(function(c){
+    var g=by[c];
+    h+='<tr class="cat"><td>'+esc(c)+'</td><td class="n">'+fmt.format(sum(g,'low'))+'</td><td class="n">'+fmt.format(sum(g,'typical'))+'</td><td class="n">'+fmt.format(sum(g,'high'))+'</td><td></td></tr>';
+    g.forEach(function(it){
+      var s=srcs[(+it.source||0)-1];
+      h+='<tr><td>'+esc(it.item)+'</td><td class="n">'+fmt.format(it.low)+'</td><td class="n">'+fmt.format(it.typical)+'</td><td class="n">'+fmt.format(it.high)+'</td><td class="basis">'+esc(it.basis)+(s?' <a class="src" target="_blank" rel="noopener" href="'+esc(s.url)+'">['+(+it.source)+']</a>':'')+'</td></tr>';
+    });
+  });
+  h+='</tbody>';
+  $('table').innerHTML=h;
+  $('srcwrap').style.display=srcs.length?'grid':'none';
+  $('sources').innerHTML=srcs.map(function(s){return '<li><a target="_blank" rel="noopener" href="'+esc(s.url)+'">'+esc(s.title||s.url)+'</a></li>'}).join('');
+  $('out').hidden=false;post();
+}
+
+function rowsOut(){
+  return last.items.map(function(it){var s=last.srcs[(+it.source||0)-1];return[it.category,it.item,it.low,it.typical,it.high,it.basis,s?s.url:'']});
+}
+function toCSV(){
+  var r=[['Category','Item','Low','Typical','High','Basis','Source']].concat(rowsOut());
+  return r.map(function(x){return x.map(function(c){return '"'+String(c).replace(/"/g,'""')+'"'}).join(',')}).join('\n');
+}
+function toMD(){
+  var f=last.fmt,out=['# Cost of living: '+(last.d.area||''),'',last.d.summary||'','','| Category | Item | Low | Typical | High | Basis |','|---|---|---:|---:|---:|---|'];
+  last.items.forEach(function(it){out.push('| '+[it.category,it.item,f.format(it.low),f.format(it.typical),f.format(it.high),it.basis].map(function(c){return String(c).replace(/\|/g,'/')}).join(' | ')+' |')});
+  out.push('| **Total** | | **'+f.format(last.T.low)+'** | **'+f.format(last.T.typical)+'** | **'+f.format(last.T.high)+'** | |');
+  if(last.srcs.length){out.push('','Sources:');last.srcs.forEach(function(s,i){out.push((i+1)+'. ['+s.title+']('+s.url+')')})}
+  return out.join('\n');
+}
+async function copy(txt,btn){
+  var ok=false;
+  try{await navigator.clipboard.writeText(txt);ok=true}catch(e){
+    var ta=document.createElement('textarea');ta.value=txt;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();
+    try{ok=document.execCommand('copy')}catch(e2){}ta.remove();
+  }
+  var o=btn.textContent;btn.textContent=ok?'Copied':'Copy failed';setTimeout(function(){btn.textContent=o},1400);
+}
+$('cpcsv').onclick=function(){if(last)copy(toCSV(),this)};
+$('cpmd').onclick=function(){if(last)copy(toMD(),this)};
+
+$('f').onsubmit=async function(e){
+  e.preventDefault();
+  var p=prov.value,k=key.value.trim(),m=model.value.trim()||P[p].model;
+  if(!k){setStatus('err','Add your '+P[p].name+' API key first.');key.focus();return}
+  if(rem.checked){set('key.'+p,k);set('model.'+p,m)}else set('key.'+p,null);
+  var fd=new FormData(this);
+  var i={area:String(fd.get('area')).trim(),adults:fd.get('adults')||1,kids:fd.get('kids')||0,style:fd.get('style'),housing:fd.get('housing'),transport:fd.get('transport')};
+  var btn=$('go');btn.disabled=true;btn.textContent='Researching...';$('out').hidden=true;
+  var t0=Date.now();
+  setStatus('busy','Searching current prices for '+i.area+'. Usually 20 to 60 seconds.');
+  var tick=setInterval(function(){var el=$('elapsed');if(el)el.textContent=Math.round((Date.now()-t0)/1000)+'s'},1000);
+  try{
+    var r=await CALL[p](k,m,prompt(i));
+    var d=parse(r.text);
+    if(!d.sources||!d.sources.length)d.sources=r.cites;
+    render(d);setStatus('','');
+  }catch(err){
+    var msg=String(err&&err.message||err);
+    if(/Failed to fetch|NetworkError|Load failed/i.test(msg))msg='Could not reach '+P[p].name+'. Check your connection, or whether an extension is blocking the request.';
+    setStatus('err',msg);
+  }finally{clearInterval(tick);btn.disabled=false;btn.textContent='Build breakdown'}
+};
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BYOK Tools · DTDM</title>
+<meta name="description" content="AI tools that run in your browser on your own API key. No account, no markup. Open one, or copy its code and host it on your own site.">
+<meta name="theme-color" content="#0a0c10">
+<meta property="og:title" content="BYOK Tools · DTDM">
+<meta property="og:description" content="Bring your own key. Skip the subscription.">
+<meta property="og:url" content="https://byok.dtdm.us/">
+<link rel="canonical" href="https://byok.dtdm.us/">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="preload" href="assets/fonts/archivo-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/fonts.css">
+<link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+
+<header class="shell site-header">
+  <a class="brand" href="./" aria-label="BYOK Tools home"><b>DTDM</b><span class="pill">BYOK</span></a>
+  <nav class="nav" aria-label="Main">
+    <a href="#tools">Tools</a>
+    <a href="https://dtdm.us" target="_blank" rel="noopener">dtdm.us ↗</a>
+  </nav>
+</header>
+
+<main class="shell">
+
+  <section class="hero">
+    <div class="mono eyebrow">byok.dtdm.us</div>
+    <h1>Bring your own key. Skip the subscription.</h1>
+    <p class="lede">AI tools that run in your browser on your own API key. No account, no markup. Open one, or copy its code and host it on your own site.</p>
+  </section>
+
+  <section class="facts" aria-label="Why BYOK">
+    <div><span class="n">01</span><strong>Your key stays with you</strong><span class="t">Requests go straight from your browser to the AI provider. Nothing passes through DTDM.</span></div>
+    <div><span class="n">02</span><strong>No account</strong><span class="t">Paste a key into any tool. Optionally remember it on this device.</span></div>
+    <div><span class="n">03</span><strong>Take the code</strong><span class="t">Every tool is a single HTML file. Copy it and host it anywhere.</span></div>
+  </section>
+
+  <section class="tools" id="tools">
+    <div class="tools-head"><h2>Tools</h2><span class="count">1</span></div>
+
+    <article class="tool-card">
+      <div class="body">
+        <div class="slug">/cost-of-living</div>
+        <h3>Cost of Living</h3>
+        <p>Enter any city or ZIP and get an itemized monthly cost breakdown: housing, food, transit, healthcare and more, built from current, cited sources.</p>
+        <div class="chips">
+          <span>Research</span>
+          <span>Live search · Itemized table</span>
+          <span>Claude · OpenAI · Gemini</span>
+          <span>v1.0 — Oct 2026</span>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button type="button" class="btn" data-copy="tools/cost-of-living.html">Copy full code</button>
+        <a class="btn btn-primary" href="cost-of-living/">Open tool →</a>
+      </div>
+    </article>
+
+    <p class="muted">More tools coming soon.</p>
+  </section>
+
+  <section class="trust" id="trust" aria-labelledby="trust-h">
+    <h2 id="trust-h">About your API key</h2>
+    <ul>
+      <li>It's stored in your browser's localStorage only if you tick "Remember on this device". Otherwise it's never saved.</li>
+      <li>Requests go directly from your browser to your provider (Anthropic, OpenAI, or Google). DTDM never sees your key or your results.</li>
+      <li>Each tool is one readable HTML file with no dependencies. Open a tool page and use View source to check the request code before you run it.</li>
+      <li>Use a dedicated key and set a spend limit on it in your provider's console. Delete the key when you're done.</li>
+    </ul>
+    <p>Copied or downloaded tools don't update themselves. Check the version tag on each tool's page for newer releases.</p>
+  </section>
+
+</main>
+
+<footer class="shell site-footer">
+  <span>Built by <a href="https://dtdm.us" target="_blank" rel="noopener">Dan the Digital Man</a></span>
+  <span>API usage is billed by your provider.</span>
+</footer>
+
+<script src="assets/site.js"></script>
+</body>
+</html>
