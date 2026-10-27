@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>.rcal Builder · BYOK by DTDM</title>
+<!--
+  .rcal Builder — BYOK tool by DTDM · v1.0 — updated Oct 2026
+  One self-contained file. No dependencies, no build step, no external fonts or scripts.
+  The form builder works fully offline and needs no key.
+  The optional "Describe it in plain language" box uses your own API key. The key is kept in this
+  browser's localStorage only if you tick "Remember on this device". Network requests go only to the
+  provider you pick: api.anthropic.com · api.openai.com · generativelanguage.googleapis.com
+  Format: .rcal spec v0.2 (open format, maintained by EventStrand). Host this file anywhere static, or double-click it.
+-->
+<style>
+:root{--bg:#0a0c10;--panel:#11141b;--panel2:#171b25;--line:#252b38;--ink:#eef1f6;--mute:#9aa3b2;--acc:#3ee6c4;--accink:#04140f;--err:#ff8a8a;--warn:#f2c46d}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 Archivo,system-ui,sans-serif}
+a{color:var(--acc)}a:hover{color:#9af5e2}
+code{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:.9em;background:var(--panel2);padding:1px 6px;border-radius:5px}
+.wrap{max-width:960px;margin:0 auto;padding:40px 20px 64px;display:grid;gap:16px}
+.embedded .wrap{padding:0 0 4px;max-width:none}
+.embedded .top{display:none}
+.mono{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12px;letter-spacing:.08em;text-transform:uppercase}
+.eyebrow{color:var(--acc)}
+h1{font-size:40px;line-height:1.05;margin:6px 0 8px;letter-spacing:-.025em;font-weight:800}
+.lede{color:var(--mute);margin:0;max-width:62ch;text-wrap:pretty}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px;display:grid;gap:16px}
+.card h2{margin:0;color:var(--mute);font-weight:500}
+.card h3{margin:0;font-size:15px}
+.grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(min(100%,190px),1fr))}
+.f{display:grid;gap:6px;font-size:13px;color:var(--mute);align-content:start}
+input,select,textarea{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px;min-height:44px;width:100%}
+textarea{min-height:110px;resize:vertical}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:-1px}
+input[type=color]{padding:4px;cursor:pointer}
+.keyrow{display:flex;gap:8px}.keyrow input{flex:1;min-width:0}
+.seg{display:flex;gap:4px;padding:4px;background:var(--bg);border:1px solid var(--line);border-radius:10px;min-height:44px}
+.seg label{flex:1;position:relative;display:flex}
+.seg input{position:absolute;opacity:0;pointer-events:none;width:auto;min-height:0}
+.seg span{flex:1;display:flex;align-items:center;justify-content:center;padding:6px 8px;border-radius:7px;color:var(--mute);cursor:pointer;font-size:14px;text-align:center}
+.seg input:checked+span{background:var(--panel2);color:var(--ink);box-shadow:inset 0 0 0 1px var(--line)}
+.seg input:focus-visible+span{outline:2px solid var(--acc)}
+.btn{font:600 15px Archivo,system-ui,sans-serif;border:0;border-radius:10px;padding:10px 18px;min-height:44px;cursor:pointer;background:var(--acc);color:var(--accink)}
+.btn:hover{filter:brightness(1.08)}.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn.ghost{background:transparent;color:var(--ink);box-shadow:inset 0 0 0 1px var(--line)}
+.btn.ghost:hover{box-shadow:inset 0 0 0 1px var(--acc);filter:none}
+.btn.sm{min-height:36px;padding:6px 12px;font-size:13px}
+.btn.del{color:var(--err)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.row.sb{justify-content:space-between}
+.check{display:flex;gap:8px;align-items:center;font-size:14px;color:var(--mute);cursor:pointer}
+.check input{width:18px;height:18px;min-height:0;accent-color:var(--acc)}
+.note{font-size:13px;color:var(--mute);margin:0}
+.status:empty{display:none}
+.status{border-radius:12px;padding:14px 16px;display:flex;gap:12px;align-items:center;background:var(--panel);border:1px solid var(--line)}
+.status.err{border-color:#5a2a2a;color:var(--err)}
+.status.ok{border-color:#1f5a4b;color:var(--acc)}
+.spin{width:16px;height:16px;border-radius:50%;border:2px solid var(--line);border-top-color:var(--acc);animation:s .8s linear infinite;flex:none}
+@keyframes s{to{transform:rotate(360deg)}}
+.explain{display:grid;gap:14px}
+.explain p{margin:0;color:var(--mute);text-wrap:pretty}
+.explain p b,.explain li b{color:var(--ink)}
+.parts{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(min(100%,210px),1fr))}
+.part{background:var(--panel2);border-radius:10px;padding:14px;display:grid;gap:4px;align-content:start}
+.part b{font-size:14px}.part span{color:var(--mute);font-size:13px}
+.tbl{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:14px;min-width:480px}
+th,td{text-align:left;padding:9px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--mute);font-weight:500}
+ul.tight{margin:0;padding-left:20px;display:grid;gap:4px;color:var(--mute);font-size:14px}
+.ev{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:16px;display:grid;gap:14px}
+.ev>.hd{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.ev .hd b{font-size:15px}
+.sub{border:1px dashed var(--line);border-radius:10px;padding:12px;display:grid;gap:12px;background:var(--panel)}
+.sub .hd{display:flex;gap:8px;justify-content:space-between;align-items:center}
+.sub .hd span{font-size:13px;color:var(--mute)}
+.tags{display:flex;flex-wrap:wrap;gap:6px}
+.tags label{position:relative}
+.tags input{position:absolute;opacity:0;pointer-events:none;width:auto;min-height:0}
+.tags span{display:inline-block;padding:5px 11px;border-radius:99px;border:1px solid var(--line);color:var(--mute);font-size:13px;cursor:pointer}
+.tags input:checked+span{background:var(--acc);color:var(--accink);border-color:var(--acc);font-weight:600}
+.tags input:focus-visible+span{outline:2px solid var(--acc);outline-offset:2px}
+.probs{margin:0;padding:0;list-style:none;display:grid;gap:6px;font-size:14px}
+.probs li{padding:8px 12px;border-radius:8px;background:var(--panel2)}
+.probs .e{color:var(--err)}.probs .w{color:var(--warn)}.probs .g{color:var(--acc)}
+pre.json{margin:0;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:14px;max-height:420px;overflow:auto;font:12.5px/1.55 'JetBrains Mono',ui-monospace,monospace;color:var(--ink)}
+.hint{font-size:12.5px;color:var(--mute);margin:0}
+</style>
+</head>
+<body>
+<main class="wrap" id="wrap">
+  <header class="top">
+    <a class="mono eyebrow" href="https://byok.dtdm.us" style="text-decoration:none">BYOK · DTDM</a>
+    <h1>.rcal Builder</h1>
+    <p class="lede">Build a recurring-event schedule file in the open .rcal format. Fill in the form, or describe the schedule in plain language and let your own AI key draft it.</p>
+  </header>
+
+  <section class="card explain" aria-labelledby="x-h">
+    <h2 class="mono" id="x-h">What is .rcal?</h2>
+    <p><b>.rcal</b> is an open, plain-JSON file format for describing the repeating rhythm of real-world life: "jazz every Friday at 9", "book club the second Thursday", "market every Saturday May to September, closed Christmas." Anyone can read, write, or build tools around it with no licence or fee. This builder follows spec v0.2, maintained by EventStrand.</p>
+    <p>It is <b>not</b> iCal. An .ics file records commitments you are doing. A .rcal file encodes <b>possibility</b>: what could be happening, on a repeating pattern, published by a venue, person, or community. It is not a calendar sync protocol.</p>
+    <div class="parts">
+      <div class="part"><b>Strand</b><span>One .rcal file. A named collection of events from a single publisher.</span></div>
+      <div class="part"><b>meta</b><span>Who is publishing: name, type, location, timezone, colour. Optional but recommended.</span></div>
+      <div class="part"><b>events</b><span>The things that happen. Each needs a stable <code>id</code> and a <code>name</code>.</span></div>
+      <div class="part"><b>Schedule</b><span>How an event repeats: rules, one date, or a hand-kept list of dates.</span></div>
+      <div class="part"><b>Exceptions</b><span>Dates a recurring event is skipped, cancelled for a range, or changed.</span></div>
+      <div class="part"><b>Live</b><span>Optional. Host the file at a fixed URL and subscriber apps re-check it for updates.</span></div>
+    </div>
+    <div class="tbl"><table>
+      <thead><tr><th>Schedule type</th><th>Use it when</th><th>Writes</th></tr></thead>
+      <tbody>
+        <tr><td><b>Recurring</b></td><td>There is a predictable pattern: weekly, monthly, yearly, seasonal.</td><td><code>recurrence</code> (+ <code>exceptions</code>)</td></tr>
+        <tr><td><b>One-off</b></td><td>It happens once and never repeats.</td><td><code>date</code></td></tr>
+        <tr><td><b>Date list</b></td><td>No pattern. You add confirmed dates as you book them (pop-ups, a DJ, an irregular market).</td><td><code>dates</code></td></tr>
+      </tbody>
+    </table></div>
+    <ul class="tight">
+      <li><b>Keep ids stable.</b> Apps match updates by <code>id</code>. Changing one makes subscribers see a different event.</li>
+      <li><b>Times are 24-hour</b> and read in the strand's timezone. An end time earlier than the start runs past midnight.</li>
+      <li><b>Rules add up.</b> Several recurrence rules on one event merge, so "weekdays plus extended Saturday" is two simple rules.</li>
+      <li><b>Unknown fields are kept.</b> Parsers should ignore what they don't recognise, so files stay compatible as the spec grows.</li>
+      <li><b>Going live is a promise.</b> If <code>live</code> is on, the file must stay at its <code>source_url</code>. People who scanned your QR code point at that exact address.</li>
+    </ul>
+    <p>Save the result as <code>name.rcal</code> and host it anywhere (serve it as <code>application/vnd.rcal+json</code>, or plain <code>application/json</code>), or load it into your EventStrand dashboard.</p>
+  </section>
+
+  <section class="card" aria-labelledby="ai-h">
+    <div class="row sb">
+      <h2 class="mono" id="ai-h">Describe it (optional, uses your key)</h2>
+      <button type="button" class="btn ghost sm" id="cpspec">Copy spec prompt for any AI chat</button>
+    </div>
+    <p class="note">Type the schedule in plain language. Your AI drafts the file and it loads into the form below for you to check. Prefer your own chat window? Copy the spec prompt, paste it there, then paste the reply into "Load existing .rcal" at the bottom.</p>
+    <div class="grid">
+      <label class="f">Provider
+        <select id="prov">
+          <option value="anthropic">Anthropic (Claude)</option>
+          <option value="openai">OpenAI</option>
+          <option value="gemini">Google Gemini</option>
+        </select>
+      </label>
+      <label class="f">Model
+        <input id="model" autocomplete="off" spellcheck="false">
+      </label>
+    </div>
+    <label class="f">API key
+      <span class="keyrow">
+        <input id="key" type="password" autocomplete="off" spellcheck="false">
+        <button type="button" class="btn ghost" id="show">Show</button>
+      </span>
+    </label>
+    <div class="row sb">
+      <label class="check"><input type="checkbox" id="rem"> Remember on this device</label>
+      <p class="note" id="keynote"></p>
+    </div>
+    <label class="f">Your schedule, in plain words
+      <textarea id="desc" placeholder="e.g. The Rusty Nail, a jazz bar in Chicago. Jazz every Friday 9pm to midnight, free entry. Happy hour weekdays 4 to 7. Closed Dec 25."></textarea>
+    </label>
+    <div class="row"><button type="button" class="btn" id="gen">Draft .rcal</button></div>
+  </section>
+
+  <div class="status" id="status" role="status" aria-live="polite"></div>
+
+  <section class="card" aria-labelledby="m-h">
+    <div class="row sb"><h2 class="mono" id="m-h">1 · The strand (who is publishing)</h2></div>
+    <div class="grid">
+      <label class="f">Name<input data-s="title" placeholder="The Rusty Nail"></label>
+      <label class="f">Type
+        <select data-s="type">
+          <option value="">Not set (defaults to venue)</option>
+          <option value="venue">Venue</option><option value="artist">Artist</option><option value="community">Community</option>
+          <option value="personal">Personal</option><option value="retail">Retail</option><option value="event">Event</option>
+        </select>
+      </label>
+      <label class="f">Timezone<input data-s="timezone" list="tzlist" placeholder="America/New_York" autocomplete="off" spellcheck="false"></label>
+      <label class="f">Accent colour<input data-s="color" type="color" value="#3ee6c4"></label>
+    </div>
+    <datalist id="tzlist"></datalist>
+    <label class="f">Description (one or two sentences)<input data-s="description" placeholder="Jazz bar in Logan Square, Chicago."></label>
+    <div class="grid">
+      <label class="f">Address<input data-s="address" placeholder="1234 N Milwaukee Ave"></label>
+      <label class="f">City<input data-s="city"></label>
+      <label class="f">State / province<input data-s="state" placeholder="IL"></label>
+      <label class="f">Country (2-letter)<input data-s="country" placeholder="US" maxlength="2"></label>
+    </div>
+    <label class="f">Website<input data-s="website" type="url" placeholder="https://example.com"></label>
+    <div class="row">
+      <label class="check"><input type="checkbox" data-s="live"> Live strand (hosted at a permanent URL)</label>
+    </div>
+    <label class="f" id="srcwrap" hidden>Source URL (where this file will always live)<input data-s="source_url" type="url" placeholder="https://example.com/strand.rcal"></label>
+  </section>
+
+  <section class="card" aria-labelledby="e-h">
+    <div class="row sb">
+      <h2 class="mono" id="e-h">2 · Events</h2>
+      <button type="button" class="btn sm" data-act="add-event">+ Add event</button>
+    </div>
+    <div id="evs" style="display:grid;gap:14px"></div>
+  </section>
+
+  <section class="card" aria-labelledby="o-h">
+    <div class="row sb">
+      <h2 class="mono" id="o-h">3 · Your .rcal file</h2>
+      <span class="mono" id="fname" style="color:var(--mute)"></span>
+    </div>
+    <ul class="probs" id="probs"></ul>
+    <pre class="json" id="json" tabindex="0" aria-label="Generated .rcal JSON"></pre>
+    <div class="row">
+      <button type="button" class="btn" id="dl">Download .rcal</button>
+      <button type="button" class="btn ghost" id="cpjson">Copy JSON</button>
+      <button type="button" class="btn ghost" id="reset">Start over</button>
+    </div>
+  </section>
+
+  <section class="card" aria-labelledby="l-h">
+    <h2 class="mono" id="l-h">Load existing .rcal</h2>
+    <p class="note">Paste JSON or choose a file to edit it in the form above. This replaces what is there now.</p>
+    <textarea id="paste" placeholder='{ "rcal": "0.1", "events": [ ... ] }' spellcheck="false"></textarea>
+    <div class="row">
+      <button type="button" class="btn ghost" id="loadpaste">Load pasted JSON</button>
+      <label class="btn ghost" style="display:inline-flex;align-items:center">Choose file<input type="file" id="file" accept=".rcal,.json,application/json" style="display:none"></label>
+    </div>
+  </section>
+</main>
+<script>
+(function(){
+'use strict';
+var NS='byok.rcal-builder.';
+var DAYS=['monday','tuesday','wednesday','thursday','friday','saturday','sunday'];
+var CATS=['general','music','food_drink','fitness','arts','education','community','market','sport','comedy','theater','spiritual','maintenance','personal'];
+var PRICES=[['','Not set (unknown)'],['free','Free'],['free_entry','Free entry'],['ticketed','Ticketed'],['donation','Donation'],['members_only','Members only'],['varies','Varies']];
+var VIBES=['mellow','social','restless','curious','spontaneous','solo','celebratory','cozy','active','outdoor','indoor','free'];
+var MONTHS=['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
+var PATTERNS=[['weekly','Every week'],['weekdays','Every weekday (Mon–Fri)'],['daily','Every day'],['monthly_week','Monthly, by weekday (e.g. 2nd Thursday)'],['monthly_date','Monthly, by date (e.g. the 1st)'],['annual','Once a year']];
+var WEEKS=['first','second','third','fourth','last'];
+var P={
+  anthropic:{name:'Anthropic',model:'claude-sonnet-5-5',ph:'sk-ant-...'},
+  openai:{name:'OpenAI',model:'gpt-4.1',ph:'sk-...'},
+  gemini:{name:'Google',model:'gemini-2.5-flash',ph:'AIza...'}
+};
+function $(id){return document.getElementById(id)}
+function get(k){try{return localStorage.getItem(NS+k)}catch(e){return null}}
+function set(k,v){try{if(v==null)localStorage.removeItem(NS+k);else localStorage.setItem(NS+k,v)}catch(e){}}
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+function slug(s){return String(s||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'')}
+function has(v){return v!=null&&String(v).trim()!==''}
+
+var embedded=false;try{embedded=window.self!==window.top}catch(e){embedded=true}
+if(embedded)document.documentElement.classList.add('embedded');
+function post(){if(!embedded)return;try{parent.postMessage({byokHeight:document.body.offsetHeight},'*')}catch(e){}}
+if(window.ResizeObserver)new ResizeObserver(post).observe(document.body);
+window.addEventListener('load',post);post();
+
+/* ---------- state ---------- */
+var SKEYS=['title','type','description','timezone','color','website','address','city','state','country','live','source_url'];
+var state;
+function blankRule(){return{pattern:'weekly',every:'1',days:[],month_week:'first',month_date:'',month:'',ts:'',te:'',season_start:'',season_end:'',start_date:'',end_date:'',extra:{}}}
+function blankEvent(){return{name:'',id:'',idTouched:false,description:'',category:'',price:'',price_note:'',ticket_url:'',lead:'',notes:'',vibes:[],sched:'recurring',rules:[blankRule()],exceptions:[],date:'',ts:'',te:'',dates:[],extra:{}}}
+function blankState(){
+  var tz='';try{tz=Intl.DateTimeFormat().resolvedOptions().timeZone||''}catch(e){}
+  return{s:{title:'',type:'',description:'',timezone:tz,color:'',website:'',address:'',city:'',state:'',country:'',live:false,source_url:''},sx:{},events:[blankEvent()]};
+}
+state=blankState();
+
+/* ---------- build output ---------- */
+function put(o,k,v){if(has(v))o[k]=v}
+function timePair(o,ts,te){if(has(ts))o.time_start=ts;if(has(te))o.time_end=te}
+function merge(o,extra){for(var k in extra)if(!(k in o))o[k]=extra[k];return o}
+function build(){
+  var s=state.s,meta={};
+  put(meta,'title',s.title);put(meta,'type',s.type);put(meta,'description',s.description);
+  var loc={};['address','city','state','country'].forEach(function(k){if(has(s[k]))loc[k]=k==='country'?String(s[k]).trim().toUpperCase():String(s[k]).trim()});
+  if(state.sx.location&&typeof state.sx.location==='object')loc=merge(loc,state.sx.location);
+  if(Object.keys(loc).length)meta.location=loc;
+  put(meta,'timezone',s.timezone);
+  if(s.color&&state.colorSet)meta.color=s.color;
+  put(meta,'website',s.website);
+  if(s.live){meta.live=true;put(meta,'source_url',s.source_url)}
+  var sx=JSON.parse(JSON.stringify(state.sx));delete sx.location;merge(meta,sx);
+  var out={rcal:'0.1'};
+  if(Object.keys(meta).length)out.meta=meta;
+  out.events=state.events.map(function(e){
+    var o={};
+    o.id=has(e.id)?e.id:'';o.name=e.name;
+    put(o,'description',e.description);
+    if(has(e.category)&&e.category!=='general')o.category=e.category;
+    if(e.vibes.length)o.vibe_tags=e.vibes.slice();
+    put(o,'price',e.price);put(o,'price_note',e.price_note);put(o,'ticket_url',e.ticket_url);
+    if(has(e.lead)&&!isNaN(+e.lead))o.lead_time_days=+e.lead;
+    put(o,'notes',e.notes);
+    if(e.sched==='oneoff'){
+      put(o,'date',e.date);timePair(o,e.ts,e.te);
+    }else if(e.sched==='dates'){
+      o.dates=e.dates.filter(function(d){return has(d.date)}).map(function(d){
+        var x={date:d.date};timePair(x,d.ts,d.te);put(x,'note',d.note);return merge(x,d.extra||{});
+      });
+      timePair(o,e.ts,e.te);
+    }else{
+      o.recurrence=e.rules.map(function(r){
+        var x={pattern:r.pattern};
+        var ev=+r.every;
+        if(ev>1&&['daily','weekly','monthly_week','monthly_date'].indexOf(r.pattern)>-1)x.every=ev;
+        if(r.pattern==='weekly'&&r.days.length)x.days=DAYS.filter(function(d){return r.days.indexOf(d)>-1});
+        if(r.pattern==='monthly_week'){x.month_week=r.month_week;if(r.days.length)x.days=DAYS.filter(function(d){return r.days.indexOf(d)>-1})}
+        if((r.pattern==='monthly_date'||r.pattern==='annual')&&has(r.month_date)&&!isNaN(+r.month_date))x.month_date=+r.month_date;
+        timePair(x,r.ts,r.te);
+        if(r.pattern==='annual'){if(has(r.month)){x.season_start=r.month;x.season_end=r.month}}
+        else{put(x,'season_start',r.season_start);put(x,'season_end',r.season_end)}
+        put(x,'start_date',r.start_date);put(x,'end_date',r.end_date);
+        return merge(x,r.extra||{});
+      });
+      if(e.exceptions.length){
+        var ex=e.exceptions.filter(function(x){return has(x.date)}).map(function(x){
+          var y={type:x.type,date:x.date};
+          if(x.type==='cancelled_range')put(y,'date_end',x.date_end);
+          put(y,'note',x.note);
+          if(x.type==='modified')timePair(y,x.ts,x.te);
+          return merge(y,x.extra||{});
+        });
+        if(ex.length)o.exceptions=ex;
+      }
+      if(e.dates.length){
+        var dd=e.dates.filter(function(d){return has(d.date)}).map(function(d){var x={date:d.date};timePair(x,d.ts,d.te);put(x,'note',d.note);return merge(x,d.extra||{})});
+        if(dd.length)o.dates=dd;
+      }
+    }
+    return merge(o,e.extra||{});
+  });
+  return out;
+}
+
+/* ---------- validate (spec v0.2 hard + soft rules) ---------- */
+var TIME=/^([01]\d|2[0-3]):[0-5]\d$/,DATE=/^\d{4}-\d{2}-\d{2}$/;
+function validate(o){
+  var er=[],wa=[];
+  if(!o||typeof o!=='object'||Array.isArray(o)){return{er:['Not a .rcal object.'],wa:[]}}
+  if(!has(o.rcal))er.push('Missing the "rcal" version key.');
+  if(!Array.isArray(o.events)){er.push('Missing the "events" array.');return{er:er,wa:wa}}
+  var m=o.meta||{};
+  if(!has(m.title))wa.push('No strand name. Apps show this as the header.');
+  if(!has(m.timezone))wa.push('No timezone. Times will have no timezone attached.');
+  if(m.live&&!has(m.source_url))wa.push('Live is on but there is no source URL.');
+  if(!o.events.length)wa.push('No events yet.');
+  var seen={};
+  o.events.forEach(function(e,i){
+    var lb='Event '+(i+1)+(has(e&&e.name)?' ("'+e.name+'")':'');
+    if(!e||typeof e!=='object'){er.push(lb+' is not an object.');return}
+    if(!has(e.name))er.push(lb+': needs a name.');
+    if(!has(e.id))er.push(lb+': needs an id.');
+    else if(seen[e.id])er.push(lb+': id "'+e.id+'" is used twice. Ids must be unique.');
+    else seen[e.id]=1;
+    var hasRec=Array.isArray(e.recurrence)&&e.recurrence.length,hasDates=Array.isArray(e.dates)&&e.dates.length,hasDate=has(e.date);
+    if(hasDate&&(e.recurrence||e.dates))er.push(lb+': a one-off date cannot also have recurrence or dates.');
+    if(!hasDate&&!hasRec&&!hasDates&&!(Array.isArray(e.dates)&&e.dates.length===0&&!e.recurrence))er.push(lb+': needs a schedule (a date, a recurrence rule, or listed dates).');
+    if(Array.isArray(e.dates)&&!e.dates.length&&!hasRec&&!hasDate)wa.push(lb+': empty date list. Apps will show "coming soon".');
+    if(hasDate&&!DATE.test(e.date))wa.push(lb+': date "'+e.date+'" is not YYYY-MM-DD.');
+    [e.time_start,e.time_end].forEach(function(t){if(has(t)&&!TIME.test(t))wa.push(lb+': time "'+t+'" is not 24-hour HH:MM.')});
+    (e.recurrence||[]).forEach(function(r,j){
+      var rb=lb+', rule '+(j+1);
+      if(!r||!has(r.pattern)){er.push(rb+': needs a pattern.');return}
+      var days=r.days||[];
+      if(r.pattern==='weekly'&&!days.length)er.push(rb+': weekly needs at least one day.');
+      if(r.pattern==='monthly_week'){if(!days.length)er.push(rb+': monthly-by-weekday needs a day.');if(!has(r.month_week))wa.push(rb+': no week chosen. Parsers treat it as "first".')}
+      if(r.pattern==='monthly_date'&&!has(r.month_date))er.push(rb+': monthly-by-date needs a day of the month.');
+      if(r.pattern==='annual'&&!has(r.month_date)&&!has(r.season_start))wa.push(rb+': yearly rule has no month or day.');
+      [r.time_start,r.time_end].forEach(function(t){if(has(t)&&!TIME.test(t))wa.push(rb+': time "'+t+'" is not 24-hour HH:MM.')});
+      if(has(r.start_date)&&has(r.end_date)&&r.end_date<r.start_date)wa.push(rb+': ends before it starts.');
+    });
+    (e.exceptions||[]).forEach(function(x,j){
+      var xb=lb+', exception '+(j+1);
+      if(!x||!has(x.date))er.push(xb+': needs a date.');
+      else if(x.type==='cancelled_range'&&!has(x.date_end))wa.push(xb+': cancelled range has no end date.');
+    });
+    (Array.isArray(e.dates)?e.dates:[]).forEach(function(d){
+      var ds=typeof d==='string'?d:(d&&d.date);
+      if(!has(ds)||!DATE.test(ds))wa.push(lb+': listed date "'+ds+'" is not YYYY-MM-DD and will be skipped.');
+    });
+  });
+  return{er:er,wa:wa};
+}
+
+/* ---------- import ---------- */
+var RK=['pattern','every','days','month_week','month_date','time_start','time_end','season_start','season_end','start_date','end_date'];
+var XK=['type','date','date_end','note','time_start','time_end'];
+var DK=['date','time_start','time_end','note'];
+var EK=['id','name','description','category','vibe_tags','vibes','price','price_note','ticket_url','lead_time_days','notes','recurrence','dates','date','time_start','time_end','exceptions'];
+var MK=['title','type','description','location','timezone','color','website','live','source_url'];
+function pick(o,known){var x={};Object.keys(o||{}).forEach(function(k){if(known.indexOf(k)<0)x[k]=o[k]});return x}
+function expandDays(a){
+  var out=[];(a||[]).forEach(function(d){
+    d=String(d).toLowerCase();
+    if(d==='weekday'||d==='weekdays')out=out.concat(DAYS.slice(0,5));
+    else if(d==='weekend')out=out.concat(DAYS.slice(5));
+    else{var f=DAYS.filter(function(n){return n===d||n.slice(0,3)===d.slice(0,3)})[0];if(f)out.push(f)}
+  });
+  return DAYS.filter(function(d){return out.indexOf(d)>-1});
+}
+function fromRcal(o){
+  var st=blankState();
+  var m=o.meta||{};
+  SKEYS.forEach(function(k){if(k in m&&k!=='live')st.s[k]=m[k]==null?'':m[k]});
+  st.s.live=!!m.live;
+  st.s.timezone=m.timezone||'';
+  var loc=m.location;
+  if(typeof loc==='string'){st.s.address=loc}
+  else if(loc&&typeof loc==='object'){['address','city','state','country'].forEach(function(k){if(loc[k])st.s[k]=loc[k]});st.sx.location=pick(loc,['address','city','state','country'])}
+  st.colorSet=!!m.color;if(m.color)st.s.color=m.color;
+  var sx=pick(m,MK);Object.keys(sx).forEach(function(k){st.sx[k]=sx[k]});
+  st.events=(o.events||[]).map(function(e){
+    var v=blankEvent();
+    v.name=e.name||'';v.id=e.id||'';v.idTouched=true;
+    v.description=e.description||'';v.category=e.category||'';v.price=e.price||'';v.price_note=e.price_note||'';v.ticket_url=e.ticket_url||'';
+    v.lead=e.lead_time_days==null?'':String(e.lead_time_days);v.notes=e.notes||'';
+    v.vibes=(e.vibe_tags||e.vibes||[]).map(String);
+    v.extra=pick(e,EK);v.rules=[];
+    if(e.date){v.sched='oneoff';v.date=e.date;v.ts=e.time_start||'';v.te=e.time_end||''}
+    else if(Array.isArray(e.recurrence)&&e.recurrence.length){
+      v.sched='recurring';
+      v.rules=e.recurrence.map(function(r){
+        var x=blankRule();x.pattern=r.pattern||'weekly';x.every=r.every?String(r.every):'1';
+        x.days=expandDays(r.days);x.month_week=r.month_week||'first';x.month_date=r.month_date==null?'':String(r.month_date);
+        x.ts=r.time_start||'';x.te=r.time_end||'';x.season_start=r.season_start||'';x.season_end=r.season_end||'';
+        x.start_date=r.start_date||'';x.end_date=r.end_date||'';
+        if(x.pattern==='annual'){x.month=x.season_start;x.season_start='';x.season_end=''}
+        if(PATTERNS.map(function(p){return p[0]}).indexOf(x.pattern)<0)x.pattern='weekly';
+        x.extra=pick(r,RK);return x;
+      });
+      v.exceptions=(e.exceptions||[]).map(function(x){return{type:x.type||'skip',date:x.date||'',date_end:x.date_end||'',note:x.note||'',ts:x.time_start||'',te:x.time_end||'',extra:pick(x,XK)}});
+      v.dates=(e.dates||[]).map(normDate);
+    }else{
+      v.sched=Array.isArray(e.dates)?'dates':'recurring';
+      if(v.sched==='dates'){v.dates=e.dates.map(normDate);v.ts=e.time_start||'';v.te=e.time_end||''}
+      else v.rules=[blankRule()];
+    }
+    return v;
+  });
+  return st;
+}
+function normDate(d){
+  if(typeof d==='string')return{date:d,ts:'',te:'',note:'',extra:{}};
+  d=d||{};return{date:d.date||'',ts:d.time_start||'',te:d.time_end||'',note:d.note||'',extra:pick(d,DK)};
+}
+
+/* ---------- render ---------- */
+function opts(list,cur){return list.map(function(o){var v=Array.isArray(o)?o[0]:o,l=Array.isArray(o)?o[1]:o;return'<option value="'+esc(v)+'"'+(String(cur)===String(v)?' selected':'')+'>'+esc(l)+'</option>'}).join('')}
+function I(path,val,extra){return'<input data-path="'+path+'" value="'+esc(val)+'" '+(extra||'')+'>'}
+function S(path,val,list,extra){return'<select data-path="'+path+'" '+(extra||'')+'>'+opts(list,val)+'</select>'}
+function F(label,inner){return'<label class="f">'+label+inner+'</label>'}
+function chips(path,all,cur,fmt){return'<div class="tags">'+all.map(function(v){return'<label><input type="checkbox" data-toggle="'+path+'" data-val="'+v+'"'+(cur.indexOf(v)>-1?' checked':'')+'><span>'+esc(fmt?fmt(v):v)+'</span></label>'}).join('')+'</div>'}
+function cap(s){return s.charAt(0).toUpperCase()+s.slice(1)}
+function ruleHTML(r,i,j){
+  var p='events.'+i+'.rules.'+j+'.',pt=r.pattern,h='<div class="sub"><div class="hd"><span>Rule '+(j+1)+'</span>'+(state.events[i].rules.length>1?'<button type="button" class="btn ghost sm del" data-act="del-rule" data-i="'+i+'" data-j="'+j+'">Remove rule</button>':'')+'</div>';
+  h+='<div class="grid">'+F('Happens',S(p+'pattern',pt,PATTERNS,'data-rerender="1"'));
+  if(['daily','weekly','monthly_week','monthly_date'].indexOf(pt)>-1){
+    var unit={daily:'days',weekly:'weeks',monthly_week:'months',monthly_date:'months'}[pt];
+    h+=F('Every N '+unit+' (1 = every)',I(p+'every',r.every,'type="number" min="1" max="52"'));
+  }
+  if(pt==='monthly_week')h+=F('Which week',S(p+'month_week',r.month_week,WEEKS.map(function(w){return[w,cap(w)]})));
+  if(pt==='monthly_date')h+=F('Day of the month (1–31)',I(p+'month_date',r.month_date,'type="number" min="1" max="31"'));
+  if(pt==='annual')h+=F('Month',S(p+'month',r.month,[['','Choose…']].concat(MONTHS.map(function(m){return[m,cap(m)]}))))+F('Day (1–31)',I(p+'month_date',r.month_date,'type="number" min="1" max="31"'));
+  h+='</div>';
+  if(pt==='weekly'||pt==='monthly_week')h+='<div class="f">Days'+chips(p+'days',DAYS,r.days,cap)+'</div>';
+  h+='<div class="grid">'+F('Starts (24h)',I(p+'ts',r.ts,'type="time"'))+F('Ends (24h, optional)',I(p+'te',r.te,'type="time"'));
+  if(pt!=='annual')h+=F('Active from month',S(p+'season_start',r.season_start,[['','All year']].concat(MONTHS.map(function(m){return[m,cap(m)]}))))+F('Active through month',S(p+'season_end',r.season_end,[['','All year']].concat(MONTHS.map(function(m){return[m,cap(m)]}))));
+  h+=F('Rule begins on (optional)',I(p+'start_date',r.start_date,'type="date"'))+F('Rule ends after (optional)',I(p+'end_date',r.end_date,'type="date"'))+'</div></div>';
+  return h;
+}
+function excHTML(x,i,k){
+  var p='events.'+i+'.exceptions.'+k+'.';
+  return'<div class="sub"><div class="hd"><span>Exception '+(k+1)+'</span><button type="button" class="btn ghost sm del" data-act="del-exc" data-i="'+i+'" data-j="'+k+'">Remove</button></div><div class="grid">'+
+    F('What happens',S(p+'type',x.type,[['skip','Skip one date'],['cancelled_range','Cancel a range of dates'],['modified','Change one date']],'data-rerender="1"'))+
+    F(x.type==='cancelled_range'?'From':'Date',I(p+'date',x.date,'type="date"'))+
+    (x.type==='cancelled_range'?F('Through',I(p+'date_end',x.date_end,'type="date"')):'')+
+    (x.type==='modified'?F('New start (24h)',I(p+'ts',x.ts,'type="time"'))+F('New end (24h)',I(p+'te',x.te,'type="time"')):'')+
+    F('Note shown to people',I(p+'note',x.note,'placeholder="Closed for Thanksgiving"'))+'</div></div>';
+}
+function dateHTML(d,i,k){
+  var p='events.'+i+'.dates.'+k+'.';
+  return'<div class="sub"><div class="hd"><span>Date '+(k+1)+'</span><button type="button" class="btn ghost sm del" data-act="del-date" data-i="'+i+'" data-j="'+k+'">Remove</button></div><div class="grid">'+
+    F('Date',I(p+'date',d.date,'type="date"'))+F('Start override (24h)',I(p+'ts',d.ts,'type="time"'))+F('End override (24h)',I(p+'te',d.te,'type="time"'))+F('Note',I(p+'note',d.note,'placeholder="Guest DJ"'))+'</div></div>';
+}
+function evHTML(e,i){
+  var p='events.'+i+'.',h='<div class="ev"><div class="hd"><b>Event '+(i+1)+(e.name?' · '+esc(e.name):'')+'</b><span class="row"><button type="button" class="btn ghost sm" data-act="dup-event" data-i="'+i+'">Duplicate</button><button type="button" class="btn ghost sm del" data-act="del-event" data-i="'+i+'">Remove</button></span></div>';
+  h+='<div class="grid">'+F('Event name',I(p+'name',e.name,'placeholder="Friday Jazz Night"'))+F('Id (lowercase-hyphen, keep stable)',I(p+'id',e.id,'spellcheck="false" autocomplete="off"'))+
+    F('Category',S(p+'category',e.category||'general',CATS.map(function(c){return[c,c.replace('_',' / ')]})))+F('Price',S(p+'price',e.price,PRICES))+'</div>';
+  h+='<div class="grid">'+F('Price note',I(p+'price_note',e.price_note,'placeholder="$15 at the door"'))+F('Ticket / RSVP link',I(p+'ticket_url',e.ticket_url,'type="url" placeholder="https://"'))+F('Show N days ahead (0 = day of)',I(p+'lead',e.lead,'type="number" min="0" max="365"'))+'</div>';
+  h+=F('Description',I(p+'description',e.description))+F('Notes for attendees',I(p+'notes',e.notes,'placeholder="Bar opens at 7pm, music at 9."'));
+  h+='<div class="f">Vibes (pick up to 5)'+chips(p+'vibes',VIBES,e.vibes)+'</div>';
+  h+='<div class="f">Schedule type<div class="seg">'+[['recurring','Recurring'],['oneoff','One-off'],['dates','Date list']].map(function(o){return'<label><input type="radio" name="sched'+i+'" data-path="'+p+'sched" data-rerender="1" value="'+o[0]+'"'+(e.sched===o[0]?' checked':'')+'><span>'+o[1]+'</span></label>'}).join('')+'</div></div>';
+  if(e.sched==='recurring'){
+    h+=e.rules.map(function(r,j){return ruleHTML(r,i,j)}).join('')+'<div class="row"><button type="button" class="btn ghost sm" data-act="add-rule" data-i="'+i+'">+ Add another rule</button></div>';
+    h+='<div class="f">Exceptions (closures, holidays, changes)</div>'+e.exceptions.map(function(x,k){return excHTML(x,i,k)}).join('')+'<div class="row"><button type="button" class="btn ghost sm" data-act="add-exc" data-i="'+i+'">+ Add exception</button></div>';
+    if(e.dates.length)h+='<div class="f">Extra listed dates</div>'+e.dates.map(function(d,k){return dateHTML(d,i,k)}).join('')+'<div class="row"><button type="button" class="btn ghost sm" data-act="add-date" data-i="'+i+'">+ Add date</button></div>';
+    else h+='<div class="row"><button type="button" class="btn ghost sm" data-act="add-date" data-i="'+i+'">+ Add an extra one-off date alongside the pattern</button></div>';
+  }else if(e.sched==='oneoff'){
+    h+='<div class="grid">'+F('Date',I(p+'date',e.date,'type="date"'))+F('Starts (24h)',I(p+'ts',e.ts,'type="time"'))+F('Ends (24h, optional)',I(p+'te',e.te,'type="time"'))+'</div>';
+  }else{
+    h+='<div class="grid">'+F('Default start (24h)',I(p+'ts',e.ts,'type="time"'))+F('Default end (24h)',I(p+'te',e.te,'type="time"'))+'</div><p class="hint">Dates inherit the default time unless you override it on a date. Add dates as you confirm them and remove past ones when you update.</p>'+
+      e.dates.map(function(d,k){return dateHTML(d,i,k)}).join('')+'<div class="row"><button type="button" class="btn ghost sm" data-act="add-date" data-i="'+i+'">+ Add date</button></div>';
+  }
+  return h+'</div>';
+}
+function renderEvents(){
+  $('evs').innerHTML=state.events.length?state.events.map(evHTML).join(''):'<p class="note">No events yet. Add one to start.</p>';
+  post();
+}
+function syncStrand(){
+  Array.prototype.forEach.call(document.querySelectorAll('[data-s]'),function(el){
+    var k=el.getAttribute('data-s');
+    if(el.type==='checkbox')el.checked=!!state.s[k];
+    else if(k==='color')el.value=state.s.color||'#3ee6c4';
+    else el.value=state.s[k]==null?'':state.s[k];
+  });
+  $('srcwrap').hidden=!state.s.live;
+}
+
+/* ---------- output panel ---------- */
+var current=null;
+function update(){
+  current=build();
+  var v=validate(current),json=JSON.stringify(current,null,2);
+  $('json').textContent=json;
+  var fn=(slug(state.s.title)||'my-strand')+'.rcal';$('fname').textContent=fn;
+  var items=v.er.map(function(t){return'<li class="e">✕ '+esc(t)+'</li>'}).concat(v.wa.map(function(t){return'<li class="w">! '+esc(t)+'</li>'}));
+  if(!v.er.length)items.unshift('<li class="g">✓ Valid .rcal'+(v.wa.length?' (with '+v.wa.length+' suggestion'+(v.wa.length>1?'s':'')+')':'')+'. Ready to download.</li>');
+  $('probs').innerHTML=items.join('');
+  $('dl').disabled=!!v.er.length;$('cpjson').disabled=!!v.er.length;
+  try{localStorage.setItem(NS+'draft',JSON.stringify(state))}catch(e){}
+  post();
+}
+function setStatus(kind,msg){
+  var s=$('status');s.className='status '+kind;
+  if(!msg){s.innerHTML='';post();return}
+  s.innerHTML=(kind==='busy'?'<span class="spin"></span>':'')+'<span>'+esc(msg)+'</span>';post();
+}
+
+/* ---------- events ---------- */
+function setPath(path,val){
+  var a=path.split('.'),o=state;
+  for(var i=0;i<a.length-1;i++)o=o[isNaN(a[i])?a[i]:+a[i]];
+  o[a[a.length-1]]=val;
+}
+function getPath(path){var a=path.split('.'),o=state;for(var i=0;i<a.length;i++){if(o==null)return;o=o[isNaN(a[i])?a[i]:+a[i]]}return o}
+
+document.addEventListener('input',onchg);
+document.addEventListener('change',onchg);
+function onchg(e){
+  var t=e.target;
+  if(t.hasAttribute&&t.hasAttribute('data-s')){
+    var k=t.getAttribute('data-s');
+    if(t.type==='checkbox'){state.s[k]=t.checked;if(k==='live')$('srcwrap').hidden=!t.checked}
+    else{state.s[k]=t.value;if(k==='color')state.colorSet=true}
+    update();return;
+  }
+  if(t.hasAttribute&&t.hasAttribute('data-toggle')){
+    var arr=getPath(t.getAttribute('data-toggle')),val=t.getAttribute('data-val'),ix=arr.indexOf(val);
+    if(t.checked&&ix<0)arr.push(val);if(!t.checked&&ix>-1)arr.splice(ix,1);
+    update();return;
+  }
+  if(t.hasAttribute&&t.hasAttribute('data-path')){
+    if(e.type==='input'&&t.type==='radio')return;
+    var path=t.getAttribute('data-path');
+    setPath(path,t.value);
+    var m=path.match(/^events\.(\d+)\.(name|id)$/);
+    if(m){
+      var ev=state.events[+m[1]];
+      if(m[2]==='id')ev.idTouched=true;
+      else if(!ev.idTouched){
+        ev.id=slug(ev.name);
+        var idEl=document.querySelector('[data-path="events.'+m[1]+'.id"]');if(idEl)idEl.value=ev.id;
+      }
+    }
+    if(t.hasAttribute('data-rerender')&&e.type==='change'){
+      if(/\.rules\.\d+\.pattern$/.test(path)){var r=getPath(path.replace(/\.pattern$/,''));r.days=r.days.length?r.days:[]}
+      renderEvents();
+    }
+    update();
+  }
+}
+document.addEventListener('click',function(e){
+  var b=e.target.closest?e.target.closest('[data-act]'):null;if(!b)return;
+  var act=b.getAttribute('data-act'),i=+b.getAttribute('data-i'),j=+b.getAttribute('data-j');
+  if(act==='add-event')state.events.push(blankEvent());
+  else if(act==='del-event')state.events.splice(i,1);
+  else if(act==='dup-event'){var c=JSON.parse(JSON.stringify(state.events[i]));c.name=c.name?c.name+' copy':'';c.id=slug(c.name);c.idTouched=false;state.events.splice(i+1,0,c)}
+  else if(act==='add-rule')state.events[i].rules.push(blankRule());
+  else if(act==='del-rule')state.events[i].rules.splice(j,1);
+  else if(act==='add-exc')state.events[i].exceptions.push({type:'skip',date:'',date_end:'',note:'',ts:'',te:'',extra:{}});
+  else if(act==='del-exc')state.events[i].exceptions.splice(j,1);
+  else if(act==='add-date')state.events[i].dates.push({date:'',ts:'',te:'',note:'',extra:{}});
+  else if(act==='del-date')state.events[i].dates.splice(j,1);
+  renderEvents();update();
+});
+
+/* ---------- download / copy / load ---------- */
+async function copy(txt,btn){
+  var ok=false;
+  try{await navigator.clipboard.writeText(txt);ok=true}catch(e){
+    var ta=document.createElement('textarea');ta.value=txt;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();
+    try{ok=document.execCommand('copy')}catch(e2){}ta.remove();
+  }
+  var o=btn.textContent;btn.textContent=ok?'Copied':'Copy failed';setTimeout(function(){btn.textContent=o},1400);
+}
+$('cpjson').onclick=function(){copy(JSON.stringify(current,null,2),this)};
+$('dl').onclick=function(){
+  var blob=new Blob([JSON.stringify(current,null,2)],{type:'application/vnd.rcal+json'});
+  var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=$('fname').textContent;
+  document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(a.href)},2000);
+};
+$('reset').onclick=function(){
+  if(!window.confirm||window.confirm('Clear the whole form and start over?')){state=blankState();syncStrand();renderEvents();update();setStatus('','')}
+};
+function loadText(txt){
+  var o;
+  try{o=JSON.parse(txt)}catch(e){var a=txt.indexOf('{'),b=txt.lastIndexOf('}');try{o=JSON.parse(txt.slice(a,b+1))}catch(e2){setStatus('err','That is not valid JSON, so it cannot be a .rcal file.');return false}}
+  if(!o||typeof o!=='object'||!Array.isArray(o.events)||!has(o.rcal)){setStatus('err','That JSON is missing the required "rcal" and "events" keys.');return false}
+  state=fromRcal(o);syncStrand();renderEvents();update();
+  setStatus('ok','Loaded '+state.events.length+' event'+(state.events.length===1?'':'s')+' into the form. Check each one below.');
+  return true;
+}
+$('loadpaste').onclick=function(){if(has($('paste').value))loadText($('paste').value)};
+$('file').onchange=function(){
+  var f=this.files&&this.files[0];if(!f)return;
+  var r=new FileReader();r.onload=function(){loadText(String(r.result))};r.readAsText(f);this.value='';
+};
+
+/* ---------- AI drafting ---------- */
+var SPEC=[
+'===== .rcal SPECIFICATION (v0.2, summary) =====',
+'.rcal is a UTF-8 JSON file. Top level: {"rcal":"0.1","meta":{...},"events":[...]}. "rcal" and "events" are required. "meta" is optional but recommended.',
+'meta: title, type (venue|artist|community|personal|retail|event), description, location {address,city,state,country (ISO alpha-2),lat,lng,name,notes}, timezone (IANA, e.g. "America/Chicago"), live (bool), source_url (required if live), color (hex), website (with https://), published (ISO date), updated (ISO datetime).',
+'Each event: id (REQUIRED, unique, lowercase-hyphenated, stable), name (REQUIRED), description, location (replaces meta.location entirely), timezone, category (music|food_drink|fitness|arts|education|community|market|sport|comedy|theater|spiritual|maintenance|personal|general), vibe_tags (array, max 5, from mellow|social|restless|curious|spontaneous|solo|celebratory|cozy|active|outdoor|indoor|free), price (free|free_entry|ticketed|donation|members_only|varies|unknown), price_note, ticket_url, lead_time_days (number), notes, plus a schedule.',
+'Schedule: every event needs at least one of recurrence, date, dates. "date" (one-off, ISO YYYY-MM-DD, with optional time_start/time_end) is mutually exclusive with recurrence and dates. recurrence and dates may coexist.',
+'recurrence: array of rules; rules are additive. Rule fields: pattern (REQUIRED: daily|weekly|monthly_week|monthly_date|annual|weekdays), every (number, interval), days (array of full lowercase day names; weekly requires it; monthly_week requires it), month_week (first|second|third|fourth|last), month_date (1-31; required for monthly_date), time_start/time_end ("HH:MM" 24h; end may be earlier than start to cross midnight), season_start/season_end (jan..dec, inclusive), season_start_day/season_end_day, fuzzy_start/fuzzy_end, start_date/end_date (ISO).',
+'annual pattern: use month_date with season_start and season_end set to the same month (e.g. {"pattern":"annual","month_date":22,"season_start":"aug","season_end":"aug"}).',
+'dates: for events with no predictable pattern; each entry is an ISO date string or {"date","time_start","time_end","note","location"}. Plain strings inherit the event-level time_start/time_end.',
+'exceptions: array of {type: skip|cancelled_range|modified, date, date_end (for cancelled_range), note, time_start, time_end, location}.',
+'Times are interpreted in the strand timezone. Unknown fields are allowed.'
+].join('\n');
+var PREAMBLE='You are helping me create a .rcal file (open event-schedule format, spec below).\nI will describe my schedule in plain language. Reply with ONE JSON object containing the complete .rcal file and nothing else: no prose, no code fences. Follow the spec exactly: valid JSON, "rcal" and "events" keys required, every event needs a stable lowercase-hyphenated "id" and a "name". Never invent details I did not give you (addresses, prices, URLs); leave those fields out.\n\n';
+$('cpspec').onclick=function(){copy(PREAMBLE+SPEC+'\n\n===== MY SCHEDULE =====\n(describe it here)',this)};
+
+var prov=$('prov'),model=$('model'),key=$('key'),rem=$('rem');
+function loadProv(){
+  var p=prov.value;model.value=get('model.'+p)||P[p].model;key.placeholder=P[p].ph;
+  var k=get('key.'+p);key.value=k||'';rem.checked=!!k;
+  $('keynote').textContent='Sent only to '+P[p].name+', straight from this browser.';
+}
+prov.value=get('provider')||'anthropic';loadProv();
+prov.onchange=function(){set('provider',prov.value);loadProv()};
+$('show').onclick=function(){key.type=key.type==='password'?'text':'password';this.textContent=key.type==='password'?'Show':'Hide'};
+rem.onchange=function(){if(!rem.checked)set('key.'+prov.value,null)};
+
+async function jfetch(url,opt){
+  var r=await fetch(url,opt),t=await r.text(),j;
+  try{j=JSON.parse(t)}catch(e){throw new Error('HTTP '+r.status+': '+t.slice(0,200))}
+  if(!r.ok){
+    var m=(j.error&&(j.error.message||j.error))||('HTTP '+r.status);m=typeof m==='string'?m:JSON.stringify(m);
+    if(r.status===401)m='The key was rejected (401). Check that you pasted the whole key and picked the matching provider. '+m;
+    else if(r.status===429)m='Rate limit or spend limit reached (429). Wait a minute, or check your limits in your provider console. '+m;
+    throw new Error(m);
+  }
+  return j;
+}
+var CALL={
+  anthropic:async function(k,m,q){
+    var j=await jfetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'content-type':'application/json','x-api-key':k,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:m,max_tokens:8000,messages:[{role:'user',content:q}]})});
+    if(j.stop_reason==='max_tokens')throw new Error('The response was cut off before it finished. Shorten the description, or pick a more capable model.');
+    return(j.content||[]).map(function(b){return b.type==='text'?b.text:''}).join('');
+  },
+  openai:async function(k,m,q){
+    var j=await jfetch('https://api.openai.com/v1/responses',{method:'POST',headers:{'content-type':'application/json','Authorization':'Bearer '+k},body:JSON.stringify({model:m,input:q})});
+    var t='';(j.output||[]).forEach(function(o){if(o.type==='message')(o.content||[]).forEach(function(c){if(c.type==='output_text')t+=c.text})});return t;
+  },
+  gemini:async function(k,m,q){
+    var j=await jfetch('https://generativelanguage.googleapis.com/v1beta/models/'+encodeURIComponent(m)+':generateContent',{method:'POST',headers:{'content-type':'application/json','x-goog-api-key':k},body:JSON.stringify({contents:[{role:'user',parts:[{text:q}]}]})});
+    var c=(j.candidates||[])[0]||{};return((c.content&&c.content.parts)||[]).map(function(p){return p.text||''}).join('');
+  }
+};
+$('gen').onclick=async function(){
+  var p=prov.value,k=key.value.trim(),m=model.value.trim()||P[p].model,d=$('desc').value.trim();
+  if(!d){setStatus('err','Describe the schedule first.');$('desc').focus();return}
+  if(!k){setStatus('err','Add your '+P[p].name+' API key first.');key.focus();return}
+  if(rem.checked){set('key.'+p,k);set('model.'+p,m)}else set('key.'+p,null);
+  var btn=this;btn.disabled=true;btn.textContent='Drafting...';
+  setStatus('busy','Drafting your .rcal file. Usually 10 to 30 seconds.');
+  try{
+    var txt=await CALL[p](k,m,PREAMBLE+SPEC+'\n\n===== MY SCHEDULE =====\nToday is '+new Date().toISOString().slice(0,10)+'.\n'+d);
+    if(!loadText(txt))return;
+    var v=validate(current);
+    if(v.er.length)setStatus('err','Drafted, but the file has problems. Fix them in the form below: '+v.er.slice(0,3).join(' '));
+  }catch(err){
+    var msg=String(err&&err.message||err);
+    if(/Failed to fetch|NetworkError|Load failed/i.test(msg))msg='Could not reach '+P[p].name+'. Check your connection, or whether an extension is blocking the request.';
+    setStatus('err',msg);
+  }finally{btn.disabled=false;btn.textContent='Draft .rcal'}
+};
+
+/* ---------- init ---------- */
+try{
+  var dl=$('tzlist');
+  if(Intl.supportedValuesOf)Intl.supportedValuesOf('timeZone').forEach(function(z){var o=document.createElement('option');o.value=z;dl.appendChild(o)});
+}catch(e){}
+try{
+  var dr=JSON.parse(localStorage.getItem(NS+'draft')||'null');
+  if(dr&&dr.s&&Array.isArray(dr.events)&&dr.events.every(function(e){return e&&Array.isArray(e.rules)&&Array.isArray(e.dates)&&Array.isArray(e.vibes)&&Array.isArray(e.exceptions)}))state=dr;
+}catch(e){}
+syncStrand();renderEvents();update();
+})();
+</script>
+</body>
+</html>

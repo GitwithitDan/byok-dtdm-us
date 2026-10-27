@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>GENMARK Suggester · BYOK by DTDM</title>
+<!--
+  GENMARK Suggester — BYOK tool by DTDM · v1.0 — updated Oct 2026
+  One self-contained file. No dependencies, no build step, no external fonts or scripts.
+  Your API key is kept in this browser's localStorage only if you tick "Remember on this device".
+  The only network requests this file makes go to the provider you pick:
+    api.anthropic.com · api.openai.com · generativelanguage.googleapis.com
+  GENMARK is an honor-system authorship mark (genmark.dtdm.us). This tool only suggests a code; you decide what to claim.
+  Host it anywhere that serves static files, or double-click it.
+-->
+<style>
+:root{--bg:#0a0c10;--panel:#11141b;--panel2:#171b25;--line:#252b38;--ink:#eef1f6;--mute:#9aa3b2;--acc:#3ee6c4;--accink:#04140f;--err:#ff8a8a}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 Archivo,system-ui,sans-serif}
+a{color:var(--acc)}a:hover{color:#9af5e2}
+code{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:.92em}
+.wrap{max-width:960px;margin:0 auto;padding:40px 20px 64px;display:grid;gap:16px}
+.embedded .wrap{padding:0 0 4px;max-width:none}
+.embedded .top{display:none}
+.mono{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12px;letter-spacing:.08em;text-transform:uppercase}
+.eyebrow{color:var(--acc)}
+h1{font-size:40px;line-height:1.05;margin:6px 0 8px;letter-spacing:-.025em;font-weight:800}
+.lede{color:var(--mute);margin:0;max-width:62ch;text-wrap:pretty}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px;display:grid;gap:16px}
+.card h2{margin:0;color:var(--mute);font-weight:500}
+.grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(min(100%,190px),1fr))}
+.f{display:grid;gap:6px;font-size:13px;color:var(--mute);align-content:start}
+input,select,textarea{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 12px;min-height:44px;width:100%}
+textarea{min-height:140px;resize:vertical}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc);outline-offset:-1px}
+.keyrow{display:flex;gap:8px}.keyrow input{flex:1;min-width:0}
+.btn{font:600 15px Archivo,system-ui,sans-serif;border:0;border-radius:10px;padding:10px 18px;min-height:44px;cursor:pointer;background:var(--acc);color:var(--accink)}
+.btn:hover{filter:brightness(1.08)}.btn:disabled{opacity:.55;cursor:progress}
+.btn.ghost{background:transparent;color:var(--ink);box-shadow:inset 0 0 0 1px var(--line)}
+.btn.ghost:hover{box-shadow:inset 0 0 0 1px var(--acc);filter:none}
+.btn.sm{min-height:34px;padding:5px 12px;font-size:13px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.check{display:flex;gap:8px;align-items:center;font-size:14px;color:var(--mute);cursor:pointer}
+.check input{width:18px;height:18px;min-height:0;accent-color:var(--acc)}
+.note{font-size:13px;color:var(--mute);margin:0}
+.status:empty{display:none}
+.status{border-radius:12px;padding:14px 16px;display:flex;gap:12px;align-items:center;background:var(--panel);border:1px solid var(--line)}
+.status.err{border-color:#5a2a2a;color:var(--err)}
+.spin{width:16px;height:16px;border-radius:50%;border:2px solid var(--line);border-top-color:var(--acc);animation:s .8s linear infinite;flex:none}
+@keyframes s{to{transform:rotate(360deg)}}
+.result{display:grid;grid-template-columns:auto 1fr;gap:22px;align-items:center}
+@media(max-width:560px){.result{grid-template-columns:1fr;text-align:center;justify-items:center}}
+.seal{width:96px;height:96px;border-radius:50%;border:3px solid var(--acc);display:grid;place-items:center;font:700 44px/1 Georgia,'Times New Roman',serif;color:var(--acc)}
+.big{font:700 34px/1.1 'JetBrains Mono',ui-monospace,monospace;letter-spacing:-.02em}
+.conf{display:inline-block;margin-left:10px;font-size:11px;vertical-align:middle;border:1px solid var(--line);border-radius:6px;padding:3px 8px;color:var(--mute)}
+.why{margin:0;text-wrap:pretty}
+.outs{display:grid;gap:8px}
+.orow{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.orow .lb{width:110px;flex:none;font-family:'JetBrains Mono',ui-monospace,monospace;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--mute)}
+.orow code{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:6px 10px}
+.sec h3{margin:0 0 6px;font-size:14px;color:var(--mute);font-weight:500}
+.sec ul{margin:0;padding-left:20px;display:grid;gap:4px}
+.alt{display:grid;gap:8px}
+.alt div{background:var(--panel2);border-radius:10px;padding:10px 14px;display:flex;gap:12px;align-items:baseline;flex-wrap:wrap}
+.alt b{font-family:'JetBrains Mono',ui-monospace,monospace;color:var(--acc)}
+.tbl{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13.5px;min-width:520px}
+th,td{border:1px solid var(--line);padding:10px;text-align:left;vertical-align:top}
+thead th{background:var(--panel2);color:var(--mute);font-weight:500}
+tbody th{background:var(--panel2);font-weight:500;white-space:nowrap}
+td b{display:block;font-family:'JetBrains Mono',ui-monospace,monospace;color:var(--acc);margin-bottom:2px}
+td span{color:var(--mute);font-size:12.5px}
+td.hit{background:rgba(62,230,196,.14);box-shadow:inset 0 0 0 2px var(--acc)}
+.chips{display:flex;gap:10px;flex-wrap:wrap}
+.chip{border:1px dashed var(--line);border-radius:10px;padding:10px 14px;font-size:13px;flex:1;min-width:220px}
+.chip b{font-family:'JetBrains Mono',ui-monospace,monospace;color:var(--acc);margin-right:8px}
+.chip.hit{border:2px solid var(--acc);background:rgba(62,230,196,.1)}
+</style>
+</head>
+<body>
+<main class="wrap" id="wrap">
+  <header class="top">
+    <a class="mono eyebrow" href="https://byok.dtdm.us" style="text-decoration:none">BYOK · DTDM</a>
+    <h1>GENMARK Suggester</h1>
+    <p class="lede">Describe how a piece of work was made. Get the GENMARK code that fits, why it fits, and the exact text to copy.</p>
+  </header>
+
+  <section class="card" aria-labelledby="k-h">
+    <h2 class="mono" id="k-h">Your API key</h2>
+    <div class="grid">
+      <label class="f">Provider
+        <select id="prov">
+          <option value="anthropic">Anthropic (Claude)</option>
+          <option value="openai">OpenAI</option>
+          <option value="gemini">Google Gemini</option>
+        </select>
+      </label>
+      <label class="f">Model
+        <input id="model" autocomplete="off" spellcheck="false">
+      </label>
+    </div>
+    <label class="f">API key
+      <span class="keyrow">
+        <input id="key" type="password" autocomplete="off" spellcheck="false">
+        <button type="button" class="btn ghost" id="show">Show</button>
+      </span>
+    </label>
+    <div class="row" style="justify-content:space-between">
+      <label class="check"><input type="checkbox" id="rem"> Remember on this device</label>
+      <p class="note" id="keynote"></p>
+    </div>
+  </section>
+
+  <form class="card" id="f" aria-labelledby="q-h">
+    <h2 class="mono" id="q-h">How was it made?</h2>
+    <label class="f">Kind of work
+      <select id="kind">
+        <option value="">Not sure / mixed</option>
+        <option>Writing or article</option><option>Image or artwork</option><option>Photo</option><option>Audio or music</option>
+        <option>Video</option><option>Code</option><option>Slides or document</option><option>Product, label or packaging</option>
+      </select>
+    </label>
+    <label class="f">What did you do, and what did AI do? Be specific and honest.
+      <textarea id="desc" required placeholder="e.g. I outlined the article and wrote the first draft myself. I asked an AI to tighten two paragraphs and suggest headlines. I rewrote everything it gave me in my own words before publishing."></textarea>
+    </label>
+    <p class="note">Useful details: who had the idea, who produced the first draft, how many AI outputs you looked at, and how much you changed before publishing.</p>
+    <div class="row"><button class="btn" id="go" type="submit">Suggest my mark</button></div>
+  </form>
+
+  <div class="status" id="status" role="status" aria-live="polite"></div>
+
+  <section class="card" id="out" hidden aria-labelledby="o-h">
+    <h2 class="mono" id="o-h">Suggested mark</h2>
+    <div class="result">
+      <div class="seal" aria-hidden="true">G</div>
+      <div style="display:grid;gap:8px">
+        <div><span class="big" id="code"></span><span class="conf mono" id="conf"></span></div>
+        <p class="why" id="why"></p>
+      </div>
+    </div>
+    <div class="outs">
+      <div class="orow"><span class="lb">Mark + code</span><code id="o1"></code><button type="button" class="btn ghost sm" data-c="o1">Copy</button></div>
+      <div class="orow"><span class="lb">Metadata</span><code id="o2"></code><button type="button" class="btn ghost sm" data-c="o2">Copy</button></div>
+      <div class="orow"><span class="lb">Citation</span><code id="o3"></code><button type="button" class="btn ghost sm" data-c="o3">Copy</button></div>
+    </div>
+    <div class="sec" id="placewrap"><h3>Where to put it</h3><p class="why" id="place"></p></div>
+    <div class="sec" id="altwrap"><h3>Other codes that could apply</h3><div class="alt" id="alts"></div></div>
+    <div class="sec" id="misswrap"><h3>Things that would change the answer</h3><ul id="miss"></ul></div>
+    <p class="note">GENMARK is an honor-system claim by the maker, like © or ™. This is a suggestion from an AI reading your description. You decide what to claim.</p>
+  </section>
+
+  <section class="card" aria-labelledby="m-h">
+    <h2 class="mono" id="m-h">The system</h2>
+    <p class="note">Each code reads left to right: where the idea originated (Conception), then how much a human shaped the result (Curation). <a href="https://genmark.dtdm.us" target="_blank" rel="noopener">genmark.dtdm.us</a></p>
+    <div class="tbl"><table id="matrix">
+      <thead><tr><th>Conception ↓ / Curation →</th><th>0 · Unreviewed</th><th>1 · Human-checked</th><th>2 · Human-refined</th></tr></thead>
+      <tbody>
+        <tr><th>H · Human</th>
+          <td data-c="H0"><b>(G)H0</b><span>Human prompts; first AI output published as-is.</span></td>
+          <td data-c="H1"><b>(G)H1</b><span>Human briefs, AI drafts, human approves with minor edits.</span></td>
+          <td data-c="H2"><b>(G)H2</b><span>Author writes every word; AI only checks grammar.</span></td></tr>
+        <tr><th>C · Collaborative</th>
+          <td><b>—</b><span>Not defined: collaborative origin implies some curation.</span></td>
+          <td data-c="C1"><b>(G)C1</b><span>Iterative prompting; AI draft published with light selection.</span></td>
+          <td data-c="C2"><b>(G)C2</b><span>Iterative back-and-forth; human substantially revises.</span></td></tr>
+        <tr><th>A · AI</th>
+          <td data-c="A0"><b>(G)A0</b><span>Generic prompt; AI determines everything; first output used.</span></td>
+          <td data-c="A1"><b>(G)A1</b><span>AI generates many outputs; human selects one.</span></td>
+          <td data-c="A2"><b>(G)A2</b><span>AI produces the first draft; human substantially transforms it.</span></td></tr>
+      </tbody>
+    </table></div>
+    <div class="chips">
+      <div class="chip" data-c="HH"><b>(G)HH</b>Full human authorship, no AI involved at any stage.</div>
+      <div class="chip" data-c="noAI"><b>(G)noAI</b>Asserts human origin where AI might otherwise be assumed.</div>
+    </div>
+  </section>
+</main>
+<script>
+(function(){
+'use strict';
+var P={
+  anthropic:{name:'Anthropic',model:'claude-sonnet-5-5',ph:'sk-ant-...'},
+  openai:{name:'OpenAI',model:'gpt-4.1',ph:'sk-...'},
+  gemini:{name:'Google',model:'gemini-2.5-flash',ph:'AIza...'}
+};
+var VALID=['HH','noAI','H0','H1','H2','C1','C2','A0','A1','A2'];
+var NS='byok.genmark-suggester.';
+function $(id){return document.getElementById(id)}
+function get(k){try{return localStorage.getItem(NS+k)}catch(e){return null}}
+function set(k,v){try{if(v==null)localStorage.removeItem(NS+k);else localStorage.setItem(NS+k,v)}catch(e){}}
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+
+var embedded=false;try{embedded=window.self!==window.top}catch(e){embedded=true}
+if(embedded)document.documentElement.classList.add('embedded');
+function post(){if(!embedded)return;try{parent.postMessage({byokHeight:document.body.offsetHeight},'*')}catch(e){}}
+if(window.ResizeObserver)new ResizeObserver(post).observe(document.body);
+window.addEventListener('load',post);post();
+
+var prov=$('prov'),model=$('model'),key=$('key'),rem=$('rem');
+function loadProv(){
+  var p=prov.value;model.value=get('model.'+p)||P[p].model;key.placeholder=P[p].ph;
+  var k=get('key.'+p);key.value=k||'';rem.checked=!!k;
+  $('keynote').textContent='Sent only to '+P[p].name+', straight from this browser.';
+}
+prov.value=get('provider')||'anthropic';loadProv();
+prov.onchange=function(){set('provider',prov.value);loadProv()};
+$('show').onclick=function(){key.type=key.type==='password'?'text':'password';this.textContent=key.type==='password'?'Show':'Hide'};
+rem.onchange=function(){if(!rem.checked)set('key.'+prov.value,null)};
+
+var SYSTEM=[
+'You assign GENMARK codes. GENMARK is an honor-system authorship mark that declares where an idea originated and how much human judgment shaped the final result. It is not a quality score, a copyright claim, or AI detection.',
+'A code is (G) plus two characters: Conception then Curation.',
+'Conception: H = Human (the human originated the idea), C = Collaborative (idea co-developed with AI through back-and-forth), A = AI (the AI originated the idea or the human gave only a generic prompt).',
+'Curation: 0 = Unreviewed (output used as-is), 1 = Human-checked (reviewed, selected, or lightly edited), 2 = Human-refined (substantially revised, rewritten, or transformed by the human).',
+'The valid codes are exactly these:',
+'H0 Human prompts; first AI output published as-is.',
+'H1 Human briefs, AI drafts, human approves with minor edits.',
+'H2 Author writes every word; AI only checks grammar.',
+'C1 Iterative prompting; AI draft published with light selection.',
+'C2 Iterative back-and-forth; human substantially revises.',
+'A0 Generic prompt; AI determines everything; first output used.',
+'A1 AI generates many outputs; human selects one.',
+'A2 AI produces the first draft; human substantially transforms it.',
+'HH Full human authorship, no AI involved at any stage.',
+'noAI Asserts human origin where AI might otherwise be assumed (no AI involvement, full human authorship).',
+'C0 does NOT exist: collaborative origin implies some curation. Never output it.',
+'Rules: base the code ONLY on what the person says they did. Do not flatter. If the description is ambiguous between two codes, choose the one that discloses MORE AI involvement and list the other as an alternative. Use HH or noAI only if the person says no AI was used at any stage (HH for plain full human authorship, noAI when the point is asserting human origin in a setting where AI might be assumed). Grammar or spell-check by AI alone still fits H2. If key facts are missing, still give your best code, lower the confidence, and list what is missing.'
+].join('\n');
+
+function userPrompt(kind,desc){
+  return [
+    SYSTEM,'',
+    'Kind of work: '+(kind||'not stated'),
+    'What the person says happened:',
+    desc,'',
+    'Return ONLY one JSON object. No prose, no code fences. Shape:',
+    '{"code":one of H0,H1,H2,C1,C2,A0,A1,A2,HH,noAI (without the (G) prefix),"confidence":"high"|"medium"|"low","reasoning":string (2-3 sentences citing what the person said),"placement":string (one sentence: where a mark like this usually goes for this kind of work),"alternatives":[{"code":valid code,"when":string (the fact that would make this the right code)}] (0 to 2 items),"missing":[string] (0 to 3 questions whose answers could change the code)}'
+  ].join('\n');
+}
+
+async function jfetch(url,opt){
+  var r=await fetch(url,opt),t=await r.text(),j;
+  try{j=JSON.parse(t)}catch(e){throw new Error('HTTP '+r.status+': '+t.slice(0,200))}
+  if(!r.ok){
+    var m=(j.error&&(j.error.message||j.error))||('HTTP '+r.status);m=typeof m==='string'?m:JSON.stringify(m);
+    if(r.status===401)m='The key was rejected (401). Check that you pasted the whole key and picked the matching provider. '+m;
+    else if(r.status===429)m='Rate limit or spend limit reached (429). Wait a minute, or check your limits in your provider console. '+m;
+    throw new Error(m);
+  }
+  return j;
+}
+var CALL={
+  anthropic:async function(k,m,q){
+    var j=await jfetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'content-type':'application/json','x-api-key':k,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:m,max_tokens:2000,messages:[{role:'user',content:q}]})});
+    return(j.content||[]).map(function(b){return b.type==='text'?b.text:''}).join('');
+  },
+  openai:async function(k,m,q){
+    var j=await jfetch('https://api.openai.com/v1/responses',{method:'POST',headers:{'content-type':'application/json','Authorization':'Bearer '+k},body:JSON.stringify({model:m,input:q})});
+    var t='';(j.output||[]).forEach(function(o){if(o.type==='message')(o.content||[]).forEach(function(c){if(c.type==='output_text')t+=c.text})});return t;
+  },
+  gemini:async function(k,m,q){
+    var j=await jfetch('https://generativelanguage.googleapis.com/v1beta/models/'+encodeURIComponent(m)+':generateContent',{method:'POST',headers:{'content-type':'application/json','x-goog-api-key':k},body:JSON.stringify({contents:[{role:'user',parts:[{text:q}]}]})});
+    var c=(j.candidates||[])[0]||{};return((c.content&&c.content.parts)||[]).map(function(p){return p.text||''}).join('');
+  }
+};
+
+function parse(t){
+  var a=t.indexOf('{'),b=t.lastIndexOf('}');
+  if(a<0||b<a)throw new Error('The model did not return a suggestion. Try again, or switch models.');
+  try{return JSON.parse(t.slice(a,b+1))}catch(e){throw new Error('Could not read the response. Try again.')}
+}
+function normCode(c){
+  c=String(c||'').replace(/^\(?G\)?/i,'').trim();
+  var hit=VALID.filter(function(v){return v.toLowerCase()===c.toLowerCase()})[0];
+  return hit||null;
+}
+function setStatus(kind,msg){
+  var s=$('status');s.className='status '+kind;
+  if(!msg){s.innerHTML='';post();return}
+  s.innerHTML=(kind==='busy'?'<span class="spin"></span>':'')+'<span>'+esc(msg)+'</span>';post();
+}
+function mark(code){
+  Array.prototype.forEach.call(document.querySelectorAll('[data-c]'),function(el){
+    if(el.tagName==='BUTTON')return;
+    el.classList.toggle('hit',el.getAttribute('data-c')===code);
+  });
+}
+function render(d){
+  var code=normCode(d.code);
+  if(!code)throw new Error('The model suggested a code that is not in the GENMARK system ("'+d.code+'"). Try again.');
+  $('code').textContent='(G)'+code;
+  var cf=String(d.confidence||'').toLowerCase();
+  $('conf').textContent=(cf==='high'||cf==='medium'||cf==='low')?cf+' confidence':'';
+  $('why').textContent=d.reasoning||'';
+  $('o1').textContent='(G)'+code;$('o2').textContent='# genmark: '+code;$('o3').textContent='GENMARK '+code+'/v1';
+  $('place').textContent=d.placement||'';$('placewrap').hidden=!d.placement;
+  var alts=(d.alternatives||[]).map(function(a){return{c:normCode(a&&a.code),w:a&&a.when}}).filter(function(a){return a.c&&a.c!==code});
+  $('alts').innerHTML=alts.map(function(a){return'<div><b>(G)'+esc(a.c)+'</b><span>'+esc(a.w||'')+'</span></div>'}).join('');
+  $('altwrap').hidden=!alts.length;
+  var miss=(d.missing||[]).filter(function(x){return typeof x==='string'&&x.trim()});
+  $('miss').innerHTML=miss.map(function(x){return'<li>'+esc(x)+'</li>'}).join('');
+  $('misswrap').hidden=!miss.length;
+  mark(code);$('out').hidden=false;post();
+}
+
+document.addEventListener('click',function(e){
+  var b=e.target.closest?e.target.closest('button[data-c]'):null;if(!b)return;
+  var txt=$(b.getAttribute('data-c')).textContent,o=b.textContent;
+  function done(ok){b.textContent=ok?'Copied':'Copy failed';setTimeout(function(){b.textContent=o},1400)}
+  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(txt).then(function(){done(true)},function(){done(fallback(txt))});
+  else done(fallback(txt));
+});
+function fallback(txt){
+  var ta=document.createElement('textarea');ta.value=txt;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();
+  var ok=false;try{ok=document.execCommand('copy')}catch(e){}ta.remove();return ok;
+}
+
+$('f').onsubmit=async function(e){
+  e.preventDefault();
+  var p=prov.value,k=key.value.trim(),m=model.value.trim()||P[p].model,d=$('desc').value.trim();
+  if(!k){setStatus('err','Add your '+P[p].name+' API key first.');key.focus();return}
+  if(!d){setStatus('err','Describe how the work was made first.');$('desc').focus();return}
+  if(rem.checked){set('key.'+p,k);set('model.'+p,m)}else set('key.'+p,null);
+  var btn=$('go');btn.disabled=true;btn.textContent='Thinking...';$('out').hidden=true;
+  setStatus('busy','Reading your description and matching it to the GENMARK system.');
+  try{
+    var txt=await CALL[p](k,m,userPrompt($('kind').value,d));
+    render(parse(txt));setStatus('','');
+  }catch(err){
+    var msg=String(err&&err.message||err);
+    if(/Failed to fetch|NetworkError|Load failed/i.test(msg))msg='Could not reach '+P[p].name+'. Check your connection, or whether an extension is blocking the request.';
+    setStatus('err',msg);
+  }finally{btn.disabled=false;btn.textContent='Suggest my mark'}
+};
+})();
+</script>
+</body>
+</html>
