@@ -21,6 +21,7 @@
   <a class="brand" href="./" aria-label="BYOK Tools home"><b>DTDM</b><span class="pill">BYOK</span></a>
   <nav class="nav" aria-label="Main">
     <a href="#tools">Tools</a>
+    <a href="#check-a-file">Check a file</a>
     <a href="find-my-api-key/">Find my API key</a>
     <a href="https://dtdm.us" target="_blank" rel="noopener">dtdm.us ↗</a>
   </nav>
@@ -88,6 +89,27 @@
     </article>
 
     <p class="muted">More tools coming soon.</p>
+  </section>
+
+  <section class="trust" id="check-a-file" aria-labelledby="check-h">
+    <h2 id="check-h">Check a file before you run it</h2>
+    <p>Each tool is one plain HTML file. Download it, check what it does, then open it. Recommended steps:</p>
+    <ol>
+      <li><strong>Download only from byok.dtdm.us.</strong> Copies from other sites are not covered by anything on this page.</li>
+      <li><strong>Ask your own AI assistant to review the file.</strong> Open a fresh chat with no connected accounts or tools, paste the recommended prompt below, then paste the file contents under it. Try a second assistant too: a disagreement between the two is a warning.</li>
+      <li><strong>Treat the AI review as a second opinion.</strong> A file can contain text written to talk an AI reviewer into calling it safe. The recommended prompt tells the reviewer to report any text aimed at it, and to list every network request and every place your key is used, with line numbers, so you can spot-check.</li>
+      <li><strong>Search the file yourself.</strong> Open it in a text editor and search for <code>http</code>, <code>fetch</code>, <code>XMLHttpRequest</code>, <code>WebSocket</code>, <code>sendBeacon</code>, <code>eval</code>, <code>atob</code> and <code>&lt;script src</code>. The only network destinations should be the AI provider API hosts the tool page names.</li>
+      <li><strong>Use a dedicated, spend-capped key.</strong> Create a key just for this, set a spend limit on it in your provider's console, and delete it when you're done. This limits the damage if a check misses something.</li>
+    </ol>
+    <p>The hosted version on each tool page is served fresh on every visit, so a review of a downloaded file does not carry over to it. The downloaded file is the one you can review once and trust as it is.</p>
+    <div class="btn-row">
+      <button type="button" class="btn btn-primary" data-copy="assets/safety-check-prompt.txt">Copy recommended safety-check prompt</button>
+      <button type="button" class="btn" data-source="assets/safety-check-prompt.txt" data-noun="prompt" aria-expanded="false" aria-controls="promptbox">View prompt</button>
+    </div>
+    <div class="copy-state" data-copy-state role="status" aria-live="polite"></div>
+    <div class="codebox" id="promptbox" hidden>
+      <pre tabindex="0" aria-label="Recommended AI file safety-check prompt">Loading…</pre>
+    </div>
   </section>
 
   <section class="trust" id="trust" aria-labelledby="trust-h">

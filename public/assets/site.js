@@ -35,7 +35,7 @@
     btn.setAttribute('data-label', orig);
     btn.textContent = msg;
     var state = document.querySelector('[data-copy-state]');
-    if (state) { state.textContent = bad ? 'Copy was blocked by the browser. Use Download .html instead.' : ''; state.className = 'copy-state' + (bad ? ' bad' : ''); }
+    if (state) { state.textContent = bad ? 'Copy was blocked by the browser. Use Download .html, or View prompt and select the text yourself.' : ''; state.className = 'copy-state' + (bad ? ' bad' : ''); }
     clearTimeout(btn._t);
     btn._t = setTimeout(function () { btn.textContent = orig; }, 1800);
   }
@@ -55,11 +55,12 @@
       var open = box.hidden;
       box.hidden = !open;
       tog.setAttribute('aria-expanded', String(open));
-      tog.textContent = open ? 'Hide source' : 'View source';
+      var noun = tog.getAttribute('data-noun') || 'source';
+      tog.textContent = open ? 'Hide ' + noun : 'View ' + noun;
       if (open && pre.getAttribute('data-loaded') !== '1') {
         load(tog.getAttribute('data-source')).then(function (t) {
           pre.textContent = t; pre.setAttribute('data-loaded', '1');
-        }).catch(function () { pre.textContent = 'Could not load the source. Open ' + tog.getAttribute('data-source') + ' directly.'; });
+        }).catch(function () { pre.textContent = 'Could not load the ' + noun + '. Open ' + tog.getAttribute('data-source') + ' directly.'; });
       }
     }
   });

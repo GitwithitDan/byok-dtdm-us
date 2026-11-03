@@ -40,12 +40,19 @@
       <a class="btn" href="../tools/rcal-builder.html" download="rcal-builder.html">Download .html</a>
       <button type="button" class="btn" data-source="../tools/rcal-builder.html" aria-expanded="false" aria-controls="codebox">View source</button>
       <button type="button" class="btn btn-primary" data-copy="../tools/rcal-builder.html">Copy full code</button>
+      <button type="button" class="btn" data-copy="../assets/safety-check-prompt.txt">Copy safety-check prompt</button>
+      <button type="button" class="btn" data-source="../assets/safety-check-prompt.txt" data-noun="prompt" aria-expanded="false" aria-controls="promptbox">View prompt</button>
     </div>
   </section>
   <div class="copy-state" data-copy-state role="status" aria-live="polite"></div>
+  <p class="safety-note">Recommended: before you open a downloaded file, paste it into your own AI assistant together with the safety-check prompt. <a href="../#check-a-file">How to check a file</a></p>
 
   <div class="codebox" id="codebox" hidden>
     <pre tabindex="0" aria-label="Full source code of the tool">Loading…</pre>
+  </div>
+
+  <div class="codebox" id="promptbox" hidden>
+    <pre tabindex="0" aria-label="Recommended AI file safety-check prompt">Loading…</pre>
   </div>
 
   <div class="runner">

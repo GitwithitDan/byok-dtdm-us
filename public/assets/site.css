@@ -88,8 +88,12 @@ main.shell { flex: 1; display: grid; grid-template-columns: minmax(0, 1fr); gap:
 /* Trust panel */
 .trust { background: var(--panel); border: 1px solid var(--line); border-left: 3px solid var(--acc); border-radius: 14px; padding: 22px 24px; display: grid; gap: 12px; }
 .trust h2, .trust h3 { font-size: 18px; font-weight: 700; letter-spacing: -0.01em; }
-.trust ul { margin: 0; padding-left: 20px; display: grid; gap: 6px; }
+.trust ul, .trust ol { margin: 0; padding-left: 20px; display: grid; gap: 6px; }
 .trust p { color: var(--mute); font-size: 14px; }
+.trust li strong { font-weight: 600; }
+.trust .btn-row { margin-top: 4px; }
+.trust .codebox { margin-top: 4px; }
+.safety-note { color: var(--mute); font-size: 14px; max-width: 80ch; }
 
 /* Tool page */
 .back { color: var(--mute); text-decoration: none; font-size: 14px; justify-self: start; }
