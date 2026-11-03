@@ -4,10 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Find My API Key · BYOK by DTDM</title>
-<meta name="description" content="Step-by-step: where to find or create an API key for Claude, ChatGPT (OpenAI), Gemini, Grok, Mistral and DeepSeek, and how to keep it safe.">
+<meta name="description" content="Where to find or create an API key for Claude (Anthropic) and OpenRouter, the two providers the BYOK tools use, and how to keep it safe.">
 <meta name="theme-color" content="#0a0c10">
 <meta property="og:title" content="Find My API Key · BYOK by DTDM">
-<meta property="og:description" content="Where to get an API key for Claude, OpenAI, Gemini and more, plus how to cap your spend.">
+<meta property="og:description" content="Where to get an API key for Claude and OpenRouter, plus how to cap your spend.">
 <meta property="og:url" content="https://byok.dtdm.us/find-my-api-key">
 <link rel="canonical" href="https://byok.dtdm.us/find-my-api-key">
 <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
@@ -71,11 +71,7 @@
     <p class="lede">An API key is a long password that lets a tool use an AI model on your account. You make one in the provider's developer dashboard, then paste it into any tool here.</p>
     <div class="jump" aria-label="Jump to a provider">
       <a href="#claude">Claude</a>
-      <a href="#openai">ChatGPT / OpenAI</a>
-      <a href="#gemini">Gemini</a>
-      <a href="#grok">Grok</a>
-      <a href="#mistral">Mistral</a>
-      <a href="#deepseek">DeepSeek</a>
+      <a href="#openrouter">OpenRouter</a>
       <a href="#safety">Keep it safe</a>
     </div>
   </section>
@@ -83,7 +79,7 @@
   <section class="callout" aria-labelledby="sub-h">
     <h2 id="sub-h">A ChatGPT or Claude subscription is not an API key</h2>
     <p>Paying for ChatGPT Plus, or using Claude in the app, does <b>not</b> give you API access. The API is a separate product in a separate dashboard, billed per use. You create the key there, and you only pay for what the tools you run actually use.</p>
-    <p>The tools on this site currently call <b>Claude, OpenAI and Gemini</b>. Grok, Mistral and DeepSeek are listed below for when you want a key for other apps or for tools added later.</p>
+    <p>The tools on this site work with <b>two providers only: Anthropic (Claude) and OpenRouter</b>. OpenRouter is how you reach OpenAI, Gemini, Mistral, Meta and many other models: one OpenRouter key, then type the model you want into the tool. Some providers, such as OpenAI, do not allow direct calls from a browser page, so a key from them would not work in these tools.</p>
   </section>
 
   <section class="providers" aria-label="Providers">
@@ -107,91 +103,24 @@
       <p class="src">Source: <a href="https://platform.claude.com/docs/en/get-api-key" target="_blank" rel="noopener">Claude Platform Docs, "Get your Claude API key"</a>. Billing step from a third-party guide: <a href="https://radar.apideck.com/blog/how-to-get-your-claude-anthropic-api-key" target="_blank" rel="noopener">Apideck</a>.</p>
     </article>
 
-    <article class="prov" id="openai">
+    <article class="prov" id="openrouter">
       <div class="prov-head">
-        <div><h2>ChatGPT / OpenAI</h2><div class="co">OpenAI · API platform</div></div>
+        <div><h2>OpenRouter</h2><div class="co">OpenRouter · one key, many models</div></div>
         <span class="tag yes">Works with every tool here</span>
       </div>
       <ol>
-        <li><strong>Sign in</strong> at <a href="https://platform.openai.com/" target="_blank" rel="noopener">platform.openai.com</a>. This is the developer platform, not chatgpt.com. Use the same email if you like, but it is a separate dashboard.</li>
-        <li><strong>Open API keys</strong> from the left sidebar, or go to <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener">platform.openai.com/api-keys</a>. You need an organization set up first.</li>
-        <li>Click <strong>Create new secret key</strong>. Add a name, choose the permission level (full or restricted), and pick a project if asked.</li>
-        <li><strong>Copy the key immediately</strong> and store it somewhere safe. Treat a key you can no longer see as lost and make a new one.</li>
-        <li>Open <strong>Billing</strong> in the dashboard and add credits or a payment method so requests go through.</li>
+        <li><strong>Sign in</strong> at <a href="https://openrouter.ai/" target="_blank" rel="noopener">openrouter.ai</a>, or create an account.</li>
+        <li><strong>Add credits</strong> on the credits page at <a href="https://openrouter.ai/settings/credits" target="_blank" rel="noopener">openrouter.ai/settings/credits</a>. Credits are prepaid, so you cannot spend more than you add.</li>
+        <li><strong>Open the keys page</strong> at <a href="https://openrouter.ai/settings/keys" target="_blank" rel="noopener">openrouter.ai/settings/keys</a> and create a new key.</li>
+        <li>Give it a <strong>name</strong>. If the form offers a <strong>credit limit</strong> or an <strong>expiration</strong>, set both. A limit caps what this one key can spend.</li>
+        <li><strong>Copy the key straight away.</strong> It is shown once. If you lose it, create a new one.</li>
+        <li>In a tool, pick <strong>OpenRouter</strong> and type the model you want, written as <code>provider/model</code>. Each model's ID is shown on its page at openrouter.ai.</li>
       </ol>
       <div class="meta">
-        <div><span>Key starts with</span><code>sk-</code></div>
-        <div><span>Tip</span>Choose a restricted key if the dialog offers it, and limit it to what the tool needs.</div>
+        <div><span>Key starts with</span><code>sk-or-</code></div>
+        <div><span>Cost</span>Each model has its own price, shown on its OpenRouter page. A fee applies when you buy credits.</div>
       </div>
-      <p class="src">Source: <a href="https://www.getmaxim.ai/bifrost/guides/api-keys/how-to-get-an-openai-api-key" target="_blank" rel="noopener">Maxim guide to getting an OpenAI API key</a>. Menu names can shift, so match the closest label if yours differs.</p>
-    </article>
-
-    <article class="prov" id="gemini">
-      <div class="prov-head">
-        <div><h2>Gemini</h2><div class="co">Google · AI Studio</div></div>
-        <span class="tag yes">Works with every tool here</span>
-      </div>
-      <ol>
-        <li>Go to <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener">aistudio.google.com/app/apikey</a> and sign in with your Google account.</li>
-        <li>On your first visit, <strong>accept the terms</strong> and confirm your region. The Gemini API is not available in every country.</li>
-        <li>Click <strong>Get API key</strong> in the left sidebar, then <strong>Create API key</strong>.</li>
-        <li>Choose <strong>Create key in new project</strong> (the simple default), or pick an existing Google Cloud project if you already use one.</li>
-        <li><strong>Copy the key</strong> and store it somewhere safe.</li>
-      </ol>
-      <div class="meta">
-        <div><span>Key starts with</span><code>AIza</code></div>
-        <div><span>Cost</span>A free tier exists with rate limits. For higher limits, turn on billing for the linked Google Cloud project; the same key keeps working.</div>
-      </div>
-      <p class="note">Optional hardening: in the linked Google Cloud project's Credentials page you can restrict the key to the Generative Language API and set quotas.</p>
-      <p class="src">Source: <a href="https://radar.apideck.com/blog/how-to-get-your-gemini-api-key" target="_blank" rel="noopener">Apideck guide to the Gemini API key</a>. Free-tier limits change often; check your AI Studio dashboard for the current numbers.</p>
-    </article>
-
-    <article class="prov" id="grok">
-      <div class="prov-head">
-        <div><h2>Grok</h2><div class="co">xAI · xAI Console</div></div>
-        <span class="tag no">Not used by the tools here yet</span>
-      </div>
-      <ol>
-        <li>Sign up or sign in at <a href="https://console.x.ai/" target="_blank" rel="noopener">console.x.ai</a>. Email, Google and X sign-in are supported.</li>
-        <li>Finish the short onboarding and accept the API terms. Read any data-sharing offer carefully before you accept it.</li>
-        <li>Click <strong>API Keys</strong> in the left sidebar, then <strong>Create API Key</strong>.</li>
-        <li>Name the key and choose its team, allowed endpoints and allowed models.</li>
-        <li><strong>Copy the secret immediately.</strong> It is shown once.</li>
-        <li>Add a payment method under <strong>Billing</strong> and set a monthly spending cap.</li>
-      </ol>
-      <div class="meta"><div><span>Key starts with</span><code>xai-</code></div><div><span>Credits</span>New accounts may get promotional credits. Check the console for the current offer.</div></div>
-      <p class="src">Source: <a href="https://radar.apideck.com/blog/how-to-get-your-grok-xai-api-key" target="_blank" rel="noopener">Apideck guide to the xAI API key</a>.</p>
-    </article>
-
-    <article class="prov" id="mistral">
-      <div class="prov-head">
-        <div><h2>Mistral</h2><div class="co">Mistral AI · Studio console</div></div>
-        <span class="tag no">Not used by the tools here yet</span>
-      </div>
-      <ol>
-        <li>Open the Studio console at <a href="https://console.mistral.ai/" target="_blank" rel="noopener">console.mistral.ai</a> and sign in.</li>
-        <li>Click <strong>API Keys</strong> in the left sidebar.</li>
-        <li>Click <strong>Create new key</strong>. Enter a name, set an expiration date, and choose the connector access scope.</li>
-        <li>Click <strong>Create new key</strong> again to confirm.</li>
-        <li><strong>Copy the key immediately.</strong> The full key is shown once.</li>
-      </ol>
-      <div class="meta"><div><span>Cost</span>API access is on by default in Free mode with no credit card. Usage and rate limits still apply.</div></div>
-      <p class="src">Source: <a href="https://docs.mistral.ai/getting-started/quickstarts/studio/activate-and-generate-api-key" target="_blank" rel="noopener">Mistral docs, "Activate Studio and generate an API key"</a>.</p>
-    </article>
-
-    <article class="prov" id="deepseek">
-      <div class="prov-head">
-        <div><h2>DeepSeek</h2><div class="co">DeepSeek · API platform</div></div>
-        <span class="tag no">Not used by the tools here yet</span>
-      </div>
-      <ol>
-        <li>Go to <a href="https://platform.deepseek.com/" target="_blank" rel="noopener">platform.deepseek.com</a> and sign up with an email address or phone number.</li>
-        <li>Open <strong>Top up</strong> and add credits. Keys will not work until the balance is funded.</li>
-        <li>Click <strong>API keys</strong> in the left sidebar, then <strong>Create new API key</strong>.</li>
-        <li>Name the key and confirm.</li>
-        <li><strong>Copy the key immediately.</strong> It is shown once.</li>
-      </ol>
-      <p class="src">Source: <a href="https://developer.puter.com/tutorials/how-to-get-deepseek-api-key/" target="_blank" rel="noopener">Puter guide to the DeepSeek API key</a>.</p>
+      <p class="src">Source: <a href="https://openrouter.ai/docs/api/api-reference/api-keys/create-keys.md" target="_blank" rel="noopener">OpenRouter API docs, "Create keys"</a> (key limit, reset and expiration options) and <a href="https://openrouter.ai/blog/tutorials/team-spend-controls-setup/" target="_blank" rel="noopener">OpenRouter spend-controls guide</a> (credits and the credits page). Button labels were not confirmed in the dashboard, so match the closest name if yours differs.</p>
     </article>
 
   </section>
@@ -203,11 +132,7 @@
         <thead><tr><th>Provider</th><th>Works in BYOK tools</th><th>Keys page</th><th>Key looks like</th></tr></thead>
         <tbody>
           <tr><td>Claude (Anthropic)</td><td>Yes</td><td>platform.claude.com/settings/keys</td><td><code>sk-ant-…</code></td></tr>
-          <tr><td>OpenAI</td><td>Yes</td><td>platform.openai.com/api-keys</td><td><code>sk-…</code></td></tr>
-          <tr><td>Gemini (Google)</td><td>Yes</td><td>aistudio.google.com/app/apikey</td><td><code>AIza…</code></td></tr>
-          <tr><td>Grok (xAI)</td><td>Not yet</td><td>console.x.ai</td><td><code>xai-…</code></td></tr>
-          <tr><td>Mistral</td><td>Not yet</td><td>console.mistral.ai</td><td>Set by Mistral</td></tr>
-          <tr><td>DeepSeek</td><td>Not yet</td><td>platform.deepseek.com</td><td>Set by DeepSeek</td></tr>
+          <tr><td>OpenRouter</td><td>Yes</td><td>openrouter.ai/settings/keys</td><td><code>sk-or-…</code></td></tr>
         </tbody>
       </table>
     </div>
@@ -222,19 +147,19 @@
       <li><strong>Leaked or unsure?</strong> Delete the key in the dashboard right away and create a new one.</li>
       <li><strong>Only tick "Remember on this device"</strong> on a computer you own. Leave it unticked on shared or public machines.</li>
     </ul>
-    <p>Tools on this site send your key only to the provider you pick, straight from your browser. DTDM never sees it.</p>
+    <p>Tools on this site send your key only to the provider you pick (Anthropic or OpenRouter), straight from your browser. DTDM never sees it.</p>
   </section>
 
   <section class="faq" aria-labelledby="faq-h">
     <h2 id="faq-h">Questions</h2>
     <details><summary>I pay for ChatGPT or Claude. Why do I still need a key?</summary><p>Chat subscriptions and API access are separate products with separate billing. The key comes from the developer dashboard linked above, and you pay per use there.</p></details>
     <details><summary>I closed the window and can't see my key.</summary><p>Keys are shown once when created. Make a new one and delete the old one.</p></details>
-    <details><summary>The tool says my key was rejected (401).</summary><p>Check that you pasted the whole key with no spaces, and that the provider dropdown in the tool matches where the key came from. A Claude key will not work under OpenAI, and the reverse.</p></details>
+    <details><summary>The tool says my key was rejected (401).</summary><p>Check that you pasted the whole key with no spaces, and that the provider dropdown in the tool matches where the key came from. A Claude key will not work under OpenRouter, and the reverse.</p></details>
     <details><summary>The tool says I hit a limit (429).</summary><p>Your account is out of credit, or you are over a rate or spend limit. Check billing and limits in the provider's dashboard, wait a minute, and try again.</p></details>
-    <details><summary>Which provider is cheapest to try?</summary><p>Gemini has a free tier with rate limits, so it is the lowest-friction way to try a tool. Prices for the paid providers change often; check each provider's pricing page.</p></details>
+<details><summary>How do I use OpenAI, Gemini or other models?</summary><p>Pick OpenRouter in the tool, paste your OpenRouter key, and type the model ID (<code>provider/model</code>) from that model's page on openrouter.ai. OpenRouter bills you for it; you do not need a separate key from the model maker.</p></details>
   </section>
 
-  <p class="note">Dashboard layouts change. Steps above were checked on Oct 27, 2026. If a button is named slightly differently, pick the closest match, or check the provider's own docs linked in each section.</p>
+  <p class="note">Dashboard layouts change. Claude steps were checked on Oct 27, 2026 and OpenRouter steps on Nov 3, 2026. If a button is named slightly differently, pick the closest match, or check the provider's own docs linked in each section.</p>
 </main>
 
 <footer class="shell site-footer">

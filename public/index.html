@@ -33,6 +33,7 @@
     <div class="mono eyebrow">byok.dtdm.us</div>
     <h1>Bring your own key. Skip the subscription.</h1>
     <p class="lede">AI tools that run in your browser on your own API key. No account, no markup. Open one, or copy its code and host it on your own site.</p>
+    <p class="muted" id="providers">Works with two providers only: Anthropic (Claude) directly, and OpenRouter, which puts OpenAI, Gemini, Mistral, Meta and many other models behind one key. No other sites are contacted.</p>
   </section>
 
   <section class="facts" aria-label="Why BYOK">
@@ -52,8 +53,8 @@
         <div class="chips">
           <span>Research</span>
           <span>Live search · Itemized table</span>
-          <span>Claude · OpenAI · Gemini</span>
-          <span>v1.0 — Oct 2026</span>
+          <span>Claude · OpenRouter</span>
+          <span>v1.1 — Nov 2026</span>
         </div>
       </div>
       <div class="btn-row">
@@ -67,7 +68,7 @@
         <div class="slug">/rcal-builder</div>
         <h3>.rcal Builder</h3>
         <p>Describe a recurring schedule in plain language and your own AI key drafts a valid file in the open .rcal format, with a plain-English explanation of how the format works.</p>
-        <div class="chips"><span>Calendar · Format</span><span>Structured · JSON + validation</span><span>Claude · OpenAI · Gemini</span><span>v1.0 — Oct 2026</span></div>
+        <div class="chips"><span>Calendar · Format</span><span>Structured · JSON + validation</span><span>Claude · OpenRouter</span><span>v1.1 — Nov 2026</span></div>
       </div>
       <div class="btn-row">
         <button type="button" class="btn" data-copy="tools/rcal-builder.html">Copy full code</button>
@@ -80,7 +81,7 @@
         <div class="slug">/genmark-suggester</div>
         <h3>GENMARK Suggester</h3>
         <p>Describe how a piece of work was made and get the GENMARK authorship code that fits, with reasoning and copy-ready mark, metadata and citation text.</p>
-        <div class="chips"><span>Content · Attribution</span><span>Structured · Code + reasoning</span><span>Claude · OpenAI · Gemini</span><span>v1.0 — Oct 2026</span></div>
+        <div class="chips"><span>Content · Attribution</span><span>Structured · Code + reasoning</span><span>Claude · OpenRouter</span><span>v1.1 — Nov 2026</span></div>
       </div>
       <div class="btn-row">
         <button type="button" class="btn" data-copy="tools/genmark-suggester.html">Copy full code</button>
@@ -116,11 +117,11 @@
     <h2 id="trust-h">About your API key</h2>
     <ul>
       <li>It's stored in your browser's localStorage only if you tick "Remember on this device". Otherwise it's never saved.</li>
-      <li>Requests go directly from your browser to your provider (Anthropic, OpenAI, or Google). DTDM never sees your key or your results.</li>
+      <li>Requests go directly from your browser to your provider (Anthropic or OpenRouter). DTDM never sees your key or your results.</li>
       <li>Each tool is one readable HTML file with no dependencies. Open a tool page and use View source to check the request code before you run it.</li>
       <li>Use a dedicated key and set a spend limit on it in your provider's console. Delete the key when you're done.</li>
     </ul>
-    <p>No key yet? <a href="find-my-api-key/">Find my API key</a> for step-by-step instructions for Claude, OpenAI, Gemini and more.</p>
+    <p>No key yet? <a href="find-my-api-key/">Find my API key</a> for step-by-step instructions for Anthropic (Claude) and OpenRouter.</p>
     <p>Copied or downloaded tools don't update themselves. Check the version tag on each tool's page for newer releases.</p>
   </section>
 

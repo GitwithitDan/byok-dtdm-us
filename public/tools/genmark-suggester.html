@@ -5,11 +5,11 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>GENMARK Suggester · BYOK by DTDM</title>
 <!--
-  GENMARK Suggester — BYOK tool by DTDM · v1.0 — updated Oct 2026
+  GENMARK Suggester — BYOK tool by DTDM · v1.1 — updated Nov 2026
   One self-contained file. No dependencies, no build step, no external fonts or scripts.
   Your API key is kept in this browser's localStorage only if you tick "Remember on this device".
   The only network requests this file makes go to the provider you pick:
-    api.anthropic.com · api.openai.com · generativelanguage.googleapis.com
+    api.anthropic.com · openrouter.ai
   GENMARK is an honor-system authorship mark (genmark.dtdm.us). This tool only suggests a code; you decide what to claim.
   Host it anywhere that serves static files, or double-click it.
 -->
@@ -92,8 +92,7 @@ td.hit{background:rgba(62,230,196,.14);box-shadow:inset 0 0 0 2px var(--acc)}
       <label class="f">Provider
         <select id="prov">
           <option value="anthropic">Anthropic (Claude)</option>
-          <option value="openai">OpenAI</option>
-          <option value="gemini">Google Gemini</option>
+          <option value="openrouter">OpenRouter (any model)</option>
         </select>
       </label>
       <label class="f">Model
@@ -181,8 +180,7 @@ td.hit{background:rgba(62,230,196,.14);box-shadow:inset 0 0 0 2px var(--acc)}
 'use strict';
 var P={
   anthropic:{name:'Anthropic',model:'claude-sonnet-5-5',ph:'sk-ant-...'},
-  openai:{name:'OpenAI',model:'gpt-4.1',ph:'sk-...'},
-  gemini:{name:'Google',model:'gemini-2.5-flash',ph:'AIza...'}
+  openrouter:{name:'OpenRouter',model:'anthropic/claude-sonnet-5.5',ph:'sk-or-...',extra:' Enter any OpenRouter model ID.'}
 };
 var VALID=['HH','noAI','H0','H1','H2','C1','C2','A0','A1','A2'];
 var NS='byok.genmark-suggester.';
@@ -201,7 +199,7 @@ var prov=$('prov'),model=$('model'),key=$('key'),rem=$('rem');
 function loadProv(){
   var p=prov.value;model.value=get('model.'+p)||P[p].model;key.placeholder=P[p].ph;
   var k=get('key.'+p);key.value=k||'';rem.checked=!!k;
-  $('keynote').textContent='Sent only to '+P[p].name+', straight from this browser.';
+  $('keynote').textContent='Sent only to '+P[p].name+', straight from this browser.'+(P[p].extra||'');
 }
 prov.value=get('provider')||'anthropic';loadProv();
 prov.onchange=function(){set('provider',prov.value);loadProv()};
@@ -245,7 +243,7 @@ async function jfetch(url,opt){
   if(!r.ok){
     var m=(j.error&&(j.error.message||j.error))||('HTTP '+r.status);m=typeof m==='string'?m:JSON.stringify(m);
     if(r.status===401)m='The key was rejected (401). Check that you pasted the whole key and picked the matching provider. '+m;
-    else if(r.status===429)m='Rate limit or spend limit reached (429). Wait a minute, or check your limits in your provider console. '+m;
+    else if(r.status===429)m='Rate limit or spend limit reached (429). Wait a minute, or check your limits in your provider console. '+m;else if(r.status===402)m='Not enough credits (402). Add credits to your OpenRouter account, or pick a cheaper model. '+m;
     throw new Error(m);
   }
   return j;
@@ -255,13 +253,11 @@ var CALL={
     var j=await jfetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'content-type':'application/json','x-api-key':k,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:m,max_tokens:2000,messages:[{role:'user',content:q}]})});
     return(j.content||[]).map(function(b){return b.type==='text'?b.text:''}).join('');
   },
-  openai:async function(k,m,q){
-    var j=await jfetch('https://api.openai.com/v1/responses',{method:'POST',headers:{'content-type':'application/json','Authorization':'Bearer '+k},body:JSON.stringify({model:m,input:q})});
-    var t='';(j.output||[]).forEach(function(o){if(o.type==='message')(o.content||[]).forEach(function(c){if(c.type==='output_text')t+=c.text})});return t;
-  },
-  gemini:async function(k,m,q){
-    var j=await jfetch('https://generativelanguage.googleapis.com/v1beta/models/'+encodeURIComponent(m)+':generateContent',{method:'POST',headers:{'content-type':'application/json','x-goog-api-key':k},body:JSON.stringify({contents:[{role:'user',parts:[{text:q}]}]})});
-    var c=(j.candidates||[])[0]||{};return((c.content&&c.content.parts)||[]).map(function(p){return p.text||''}).join('');
+  openrouter:async function(k,m,q){
+    var j=await jfetch('https://openrouter.ai/api/v1/chat/completions',{method:'POST',headers:{'content-type':'application/json','Authorization':'Bearer '+k},body:JSON.stringify({model:m,max_tokens:2000,messages:[{role:'user',content:q}]})});
+    if(j&&j.error)throw new Error(typeof j.error.message==='string'?j.error.message:'OpenRouter returned an error. Try again, or pick another model.');
+    var c=(j.choices||[])[0];if(!c)throw new Error('OpenRouter returned no answer. Try again, or pick another model.');if(c.error)throw new Error(typeof c.error.message==='string'?c.error.message:'The model returned an error. Try again, or pick another model.');var msg=c.message||{};var text=typeof msg.content==='string'?msg.content:(Array.isArray(msg.content)?msg.content.map(function(p){return p&&p.text||''}).join(''):'');
+    return text;
   }
 };
 
